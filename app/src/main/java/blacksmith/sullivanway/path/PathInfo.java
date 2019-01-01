@@ -7,6 +7,9 @@ import java.util.ArrayList;
 
 import blacksmith.sullivanway.database.StnInfo;
 
+/**
+ * PathInfoActivity 에서 경로 계산 결과값을 출력할 데이터
+ */
 public class PathInfo implements Parcelable {
     private ArrayList<Integer> path = new ArrayList<>();
     private ArrayList<Integer> times = new ArrayList<>();

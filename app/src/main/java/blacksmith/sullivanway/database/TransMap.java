@@ -2,7 +2,7 @@ package blacksmith.sullivanway.database;
 
 import android.database.sqlite.SQLiteDatabase;
 
-import blacksmith.sullivanway.MainActivity;
+import blacksmith.sullivanway.activity.MainActivity;
 import blacksmith.sullivanway.R;
 
 public class TransMap {

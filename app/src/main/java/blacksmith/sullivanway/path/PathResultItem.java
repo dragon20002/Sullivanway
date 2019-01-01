@@ -7,10 +7,13 @@ import android.os.Parcelable;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-import blacksmith.sullivanway.data.LineInfo;
+import blacksmith.sullivanway.model.LineInfo;
 import blacksmith.sullivanway.database.StnInfo;
 
-/* 1호선 창동 - 4호선 창동 환승
+/*
+ * 다익스트라 알고리즘으로 경로를 계산한 결과
+ *
+ * 1호선 창동 - 4호선 창동 환승
  *  i    sL    sS       j   eL    eS
  *  0   1호선 소요산    1  1호선 동두천
  *                  ....

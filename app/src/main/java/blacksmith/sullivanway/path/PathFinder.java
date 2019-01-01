@@ -1,5 +1,8 @@
 package blacksmith.sullivanway.path;
 
+/**
+ * 다익스트라 알고리즘으로 경로를 계산한다.
+ */
 public class PathFinder {
     private int[][] matrix; //시간 가중치인접행렬
     private int[][] transMatrix; //환승횟수 가중치인접행렬

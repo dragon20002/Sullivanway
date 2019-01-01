@@ -1,27 +1,35 @@
 {
   "project_info": {
-    "project_number": "98323168804",
-    "firebase_url": "https://sullivanway01.firebaseio.com",
-    "project_id": "sullivanway01",
-    "storage_bucket": "sullivanway01.appspot.com"
+    "project_number": "732982960560",
+    "firebase_url": "https://sullivanway-35eef.firebaseio.com",
+    "project_id": "sullivanway-35eef",
+    "storage_bucket": "sullivanway-35eef.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:98323168804:android:a33549714e296530",
+        "mobilesdk_app_id": "1:732982960560:android:a33549714e296530",
         "android_client_info": {
           "package_name": "blacksmith.sullivanway"
         }
       },
       "oauth_client": [
         {
-          "client_id": "98323168804-3dpqn32mfpba0kg2rktatorqke7d34vt.apps.googleusercontent.com",
+          "client_id": "732982960560-it1k0pp6ldb80vlh7fdph4vnrrhfbh90.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "blacksmith.sullivanway",
+            "certificate_hash": "b1015c6a6ee0a10566054f8425a597b14246f1d8"
+          }
+        },
+        {
+          "client_id": "732982960560-v8j2g1jk64f1ri9shrctm8dmreossslj.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCPpCBBgb2rWzJaihcKh-wRUTWoQNpCp2c"
+          "current_key": "AIzaSyAEb2qCRN-fFaXvryBTVnFY79I6A0DIn2E"
         }
       ],
       "services": {
@@ -29,8 +37,13 @@
           "status": 1
         },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "732982960560-v8j2g1jk64f1ri9shrctm8dmreossslj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         },
         "ads_service": {
           "status": 2

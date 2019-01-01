@@ -4,7 +4,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import blacksmith.sullivanway.MainActivity;
+import blacksmith.sullivanway.activity.MainActivity;
 
 public class FavoritePath {
     private static SQLiteDatabase db;
