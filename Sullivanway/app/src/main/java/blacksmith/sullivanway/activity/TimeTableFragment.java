@@ -17,13 +17,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import blacksmith.sullivanway.R;
-import blacksmith.sullivanway.utils.TimeTableInfo;
+import blacksmith.sullivanway.utils.TimeTable;
 
 import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 
 public class TimeTableFragment extends Fragment {
-    private ArrayList<TimeTableInfo> upInfos = new ArrayList<>();
-    private ArrayList<TimeTableInfo> downInfos = new ArrayList<>();
+    private ArrayList<TimeTable> upInfos = new ArrayList<>();
+    private ArrayList<TimeTable> downInfos = new ArrayList<>();
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -36,17 +36,22 @@ public class TimeTableFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         Bundle bundle = getArguments();
-        String lineNm = bundle.getString("lineNm");
-        String stnNm = bundle.getString("stnNm");
-        int weekTag = bundle.getInt("weekTag");
+        String lineNm = null;
+        String stnNm = null;
+        int weekTag = 0;
+        if (bundle != null) {
+            lineNm = bundle.getString("lineNm");
+            stnNm = bundle.getString("stnNm");
+            weekTag = bundle.getInt("weekTag");
+        }
 
-        if (getView() != null) {
+        if (getView() != null && getActivity() != null) {
             ListView listView = getView().findViewById(R.id.listView);
 
             // 열차 시간표
             try {
-                ArrayList<TimeTableInfo> ttInfos = TimeTableInfo.createArrayListInstance(getActivity(), lineNm, stnNm, weekTag);
-                for (TimeTableInfo ttInfo : ttInfos) {
+                ArrayList<TimeTable> ttInfos = TimeTable.createArrayListInstance(getActivity(), lineNm, stnNm, weekTag);
+                for (TimeTable ttInfo : ttInfos) {
                     if (ttInfo.getInoutTag().equals("1"))
                         upInfos.add(ttInfo);
                     else
@@ -66,13 +71,13 @@ public class TimeTableFragment extends Fragment {
 
                     // 현재 행의 시간 분보다 작으면 데이터를 넣는다
                     if (ui < upInfos.size() && upInfos.get(ui).getLeftHour() == hour && upInfos.get(ui).getLeftMin() <= min) {
-                        TimeTableInfo info = upInfos.get(ui);
+                        TimeTable info = upInfos.get(ui);
                         item.setUpward(info.getEndStnNm(), info.getLeftHour(), info.getLeftMin(), info.getIsExpress());
                         ui++;
                         up_insert_flag = true;
                     }
                     if (di < downInfos.size() && downInfos.get(di).getLeftHour() == hour && downInfos.get(di).getLeftMin() <= min) {
-                        TimeTableInfo info = downInfos.get(di);
+                        TimeTable info = downInfos.get(di);
                         item.setDownward(info.getEndStnNm(), info.getLeftHour(), info.getLeftMin(), info.getIsExpress());
                         di++;
                         down_insert_flag = true;
@@ -114,6 +119,7 @@ public class TimeTableFragment extends Fragment {
             upTime = String.format(MainActivity.DEFAULT_LOCALE, "%02d:%02d", hour, min);
             upIsExpress = isExpress;
         }
+
         void setDownward(String stnNm, int hour, int min, boolean isExpress) {
             downStnNm = String.format("%s행", stnNm);
             downTime = String.format(MainActivity.DEFAULT_LOCALE, "%02d:%02d", hour, min);

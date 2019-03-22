@@ -38,16 +38,16 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import blacksmith.sullivanway.R;
-import blacksmith.sullivanway.database.FavoritePath;
+import blacksmith.sullivanway.database.FavoriteRoute;
 import blacksmith.sullivanway.database.MyDBOpenHelper;
-import blacksmith.sullivanway.database.StnInfo;
-import blacksmith.sullivanway.path.PathFinder;
-import blacksmith.sullivanway.path.PathInfo;
-import blacksmith.sullivanway.path.PathResultItem;
-import blacksmith.sullivanway.path.StationMatrix;
-import blacksmith.sullivanway.utils.LineInfo;
-import blacksmith.sullivanway.utils.SubwayMapTouchPosition;
-import blacksmith.sullivanway.view.StnTouchDialog;
+import blacksmith.sullivanway.database.Station;
+import blacksmith.sullivanway.routeguidance.Route;
+import blacksmith.sullivanway.routeguidance.RouteFinder;
+import blacksmith.sullivanway.routeguidance.RouteWrapper;
+import blacksmith.sullivanway.routeguidance.StationMatrix;
+import blacksmith.sullivanway.utils.SubwayLine;
+import blacksmith.sullivanway.utils.SubwayMapTouchPoint;
+import blacksmith.sullivanway.dialog.StationMenuDialog;
 
 import static android.view.View.GONE;
 import static java.lang.Thread.sleep;
@@ -59,8 +59,8 @@ public class MainActivity extends AppCompatActivity {
     private static final int TRANS_SETTING_ACTIVITY_CODE = 2;
 
     private StationMatrix stationMatrix;
-    private ArrayList<StnInfo> stnIdx;
-    private SubwayMapTouchPosition subwayMapTouchPosition;
+    private ArrayList<Station> stnIdx;
+    private SubwayMapTouchPoint subwayMapTouchPoint;
     private SearchListAdapter searchListAdapter;
 
     private static final String TAG = "MainActivity";
@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
     private SearchView searchView;
     private ListView searchList;
     private TextView startStnTextView, endStnTextView;
-    private StnTouchDialog dialog;
+    private StationMenuDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,10 +115,10 @@ public class MainActivity extends AppCompatActivity {
         startStnTextView = findViewById(R.id.startStnTextView);
         endStnTextView = findViewById(R.id.endStnTextView);
         startStnTextView.setOnClickListener(v -> {
-            v.setVisibility(GONE);  subwayMapTouchPosition.startStn = null;
+            v.setVisibility(GONE);  subwayMapTouchPoint.startStn = null;
         });
         endStnTextView.setOnClickListener(v -> {
-            v.setVisibility(GONE);  subwayMapTouchPosition.endStn = null;
+            v.setVisibility(GONE);  subwayMapTouchPoint.endStn = null;
         });
 
         // activity_main 의 플로팅 액션 버튼 동그라미
@@ -130,15 +130,15 @@ public class MainActivity extends AppCompatActivity {
             animateFAB(); // 버튼 클릭시 FloatingAction 애니메이션 시작
         });
         fab_favorite.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, FavoriteActivity.class);
+            Intent intent = new Intent(MainActivity.this, FavoriteRouteActivity.class);
             startActivityForResult(intent, FAV_ACTIVITY_CODE);
         });
         fab_trans_map.setOnClickListener(view -> {
-            Intent intent = new Intent(MainActivity.this, TransferMapNameListActivity.class);
+            Intent intent = new Intent(MainActivity.this, TransferMapListActivity.class);
             startActivity(intent);
         });
         fab_settings.setOnClickListener(view -> {
-            Intent intent = new Intent(MainActivity.this, TransferStnSettingActivity.class);
+            Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
             startActivityForResult(intent, TRANS_SETTING_ACTIVITY_CODE);
         });
 
@@ -182,9 +182,9 @@ public class MainActivity extends AppCompatActivity {
             switch (requestCode) {
                 case FAV_ACTIVITY_CODE:
                 case PATH_INFO_ACTIVITY_CODE:
-                    // intent로 받은 출발역, 도착역, 경유역에 대한 SubwayMapTouchPosition.StnPoint 객체를 완성
-                    subwayMapTouchPosition.startStn = subwayMapTouchPosition.getStn(stnIdx, data.getStringExtra("startLineNm"), data.getStringExtra("startStnNm"));
-                    subwayMapTouchPosition.endStn = subwayMapTouchPosition.getStn(stnIdx, data.getStringExtra("endLineNm"), data.getStringExtra("endStnNm"));
+                    // intent로 받은 출발역, 도착역, 경유역에 대한 SubwayMapTouchPoint.StnPoint 객체를 완성
+                    subwayMapTouchPoint.startStn = subwayMapTouchPoint.getStation(stnIdx, data.getStringExtra("startLineNm"), data.getStringExtra("startStnNm"));
+                    subwayMapTouchPoint.endStn = subwayMapTouchPoint.getStation(stnIdx, data.getStringExtra("endLineNm"), data.getStringExtra("endStnNm"));
 
                     // 경로 계산 쓰레드 실행
                     new PathFinderThread().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
@@ -200,33 +200,33 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // 역 터치 dialog
-    private void displayStationTouchDialog(final StnInfo stn) {
+    private void displayStationTouchDialog(final Station stn) {
         // Dialog 생성, 메뉴 리스너 설정
-        dialog = new StnTouchDialog(MainActivity.this, subwayMapTouchPosition.getLineNms(stnIdx, stn), stn.getStnNm());
+        dialog = new StationMenuDialog(MainActivity.this, subwayMapTouchPoint.getLineNms(stnIdx, stn), stn.getStnNm());
         dialog.setOnClickListener(v -> {
             switch (v.getId()) {
                 /* 이 switch문에서는 위에서 받은 역 정보(stn)를 팝업메뉴에서 선택한 아이템에 따라
                  * lineMapView의 startStn(출발역), endStn(도착역), viaStn(경유역)에 '저장'하거나
-                 * '역 정보 액티비티'(StnInfoActivity)를 호출할 수 있어
+                 * '역 정보 액티비티'(StnInfoPagerActivity)를 호출할 수 있어
                  *
-                 * switch문 아래에 있는 '경로 안내 액티비티'(PathInfoActivity)는
-                 * 출발역(SubwayMapTouchPosition.startStn), 도착역(SubwayMapTouchPosition.endStn)이 둘 다 설정된 경우에만 호출되도록 했고,
-                 * 출발역, 도착역 둘 다 설정하기 전에 경유역(SubwayMapTouchPosition.viaStn)을 설정하면 출발역-경유역-도착역 경로를 알려줘 **/
+                 * switch문 아래에 있는 '경로 안내 액티비티'(RouteGuidancePagerActivity)는
+                 * 출발역(SubwayMapTouchPoint.startStn), 도착역(SubwayMapTouchPoint.endStn)이 둘 다 설정된 경우에만 호출되도록 했고,
+                 * 출발역, 도착역 둘 다 설정하기 전에 경유역(SubwayMapTouchPoint.viaStn)을 설정하면 출발역-경유역-도착역 경로를 알려줘 **/
                 case R.id.start: //출발역
-                    subwayMapTouchPosition.startStn = stn; //SubwayMapTouchPosition map의 startStn에 출발역 정보를 저장한다
+                    subwayMapTouchPoint.startStn = stn; //SubwayMapTouchPoint map의 startStn에 출발역 정보를 저장한다
                     startStnTextView.setText(String.format("  %s: %s   ", getString(R.string.start_station), stn.getStnNm()));
                     startStnTextView.setVisibility(View.VISIBLE);
-                    if (subwayMapTouchPosition.endStn == null) { //SubwayMapTouchPosition map의 endStn이 선택되었는지 검사하여
+                    if (subwayMapTouchPoint.endStn == null) { //SubwayMapTouchPoint map의 endStn이 선택되었는지 검사하여
                         dialog.cancel();
                         return; //null이면 다이얼로그를 종료하고,
                     }
-                    break; //null이 아니면 switch문 다음에서 '경로 안내 액티비티'(PathInfoActivity)를 호출한다
+                    break; //null이 아니면 switch문 다음에서 '경로 안내 액티비티'(RouteGuidancePagerActivity)를 호출한다
 
                 case R.id.end: //도착역 (R.id.start와 비슷함)
-                    subwayMapTouchPosition.endStn = stn;
+                    subwayMapTouchPoint.endStn = stn;
                     endStnTextView.setText(String.format("  %s: %s   ", getString(R.string.end_station), stn.getStnNm()));
                     endStnTextView.setVisibility(View.VISIBLE);
-                    if (subwayMapTouchPosition.startStn == null) {
+                    if (subwayMapTouchPoint.startStn == null) {
                         dialog.cancel();
                         return;
                     }
@@ -234,8 +234,8 @@ public class MainActivity extends AppCompatActivity {
 
                 case R.id.info: //정보
                     // 역 정보 Activity 호출
-                    Intent intent = new Intent(MainActivity.this, StnInfoActivity.class);
-                    intent.putExtra("lines", subwayMapTouchPosition.getLineNms(stnIdx, stn));
+                    Intent intent = new Intent(MainActivity.this, StnInfoPagerActivity.class);
+                    intent.putExtra("lines", subwayMapTouchPoint.getLineNms(stnIdx, stn));
                     intent.putExtra("stnNm", stn.getStnNm());
                     MainActivity.this.startActivity(intent);
                     dialog.cancel();
@@ -301,7 +301,7 @@ public class MainActivity extends AppCompatActivity {
             if (!isDbValid) //유효한 테이블이 없으면 DB를 새로 생성한다
                 myDBOpenHelper.initDatabase(db, true);
 
-            subwayMapTouchPosition = new SubwayMapTouchPosition(MainActivity.this); //역 터치 좌표 초기화
+            subwayMapTouchPoint = new SubwayMapTouchPoint(MainActivity.this); //역 터치 좌표 초기화
             stationMatrix = new StationMatrix(myDBOpenHelper.getReadableDatabase());
             stnIdx = stationMatrix.getStnIdx();
 
@@ -337,31 +337,31 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(Void... params) {
-            /* SubwayMapTouchPosition map의 startStn, endStn을
+            /* SubwayMapTouchPoint map의 startStn, endStn을
              * 경로정보액티비티에서 사용할 수 있도록 intent에 저장한다  **/
-            if (StnInfo.compare(subwayMapTouchPosition.startStn, subwayMapTouchPosition.endStn) == 2) { //출발역과 도착역이 다를 때
-                String startLineNm = subwayMapTouchPosition.startStn.getLineNm();
-                String startStnNm = subwayMapTouchPosition.startStn.getStnNm();
-                String endLineNm = subwayMapTouchPosition.endStn.getLineNm();
-                String endStnNm = subwayMapTouchPosition.endStn.getStnNm();
+            if (Station.compare(subwayMapTouchPoint.startStn, subwayMapTouchPoint.endStn) == 2) { //출발역과 도착역이 다를 때
+                String startLineNm = subwayMapTouchPoint.startStn.getLineNm();
+                String startStnNm = subwayMapTouchPoint.startStn.getStnNm();
+                String endLineNm = subwayMapTouchPoint.endStn.getLineNm();
+                String endStnNm = subwayMapTouchPoint.endStn.getStnNm();
 
                 // 출발역에서 도착역까지 갈 수 있는 경로 계산
                 Calendar calendar = Calendar.getInstance(); //현재 날짜 시간
-                ArrayList<Integer> startIdxs = subwayMapTouchPosition.getIdxs(stnIdx, subwayMapTouchPosition.startStn);
-                ArrayList<Integer> endIdxs = subwayMapTouchPosition.getIdxs(stnIdx, subwayMapTouchPosition.endStn);
+                ArrayList<Integer> startIdxs = subwayMapTouchPoint.getIndexes(stnIdx, subwayMapTouchPoint.startStn);
+                ArrayList<Integer> endIdxs = subwayMapTouchPoint.getIndexes(stnIdx, subwayMapTouchPoint.endStn);
                 stationMatrix.setVirtualNodes(startIdxs, endIdxs);
 
-                PathInfo lessTransInfo = new PathFinder(0, stationMatrix).getPathInfo(); //최소환승 경로
-                PathInfo minDistInfo = new PathFinder(1, stationMatrix).getPathInfo(); //최단시간 경로
-                ArrayList<PathResultItem> lessTransItems = PathResultItem.createArrayListInstance(MainActivity.this, stnIdx, calendar, lessTransInfo);
-                ArrayList<PathResultItem> minDistItems = PathResultItem.createArrayListInstance(MainActivity.this, stnIdx, calendar, minDistInfo);
+                Route lessTransInfo = new RouteFinder(0, stationMatrix).getRoute(); //최소환승 경로
+                Route minDistInfo = new RouteFinder(1, stationMatrix).getRoute(); //최단시간 경로
+                ArrayList<RouteWrapper> lessTransItems = RouteWrapper.createArrayListInstance(MainActivity.this, stnIdx, calendar, lessTransInfo);
+                ArrayList<RouteWrapper> minDistItems = RouteWrapper.createArrayListInstance(MainActivity.this, stnIdx, calendar, minDistInfo);
 
                 // history 저장
-                boolean favorite = FavoritePath.insert(false, startLineNm, endLineNm, startStnNm, endStnNm);
+                boolean favorite = FavoriteRoute.insert(false, startLineNm, endLineNm, startStnNm, endStnNm);
                 //현재 경로가 즐겨찾기에 추가되어 있으면 true, 아니면 false를 반환한다
 
                 // PathInfoActivity에 보낼 intent 작성 (경로, 시간, 환승횟수)
-                Intent intent = new Intent(MainActivity.this, PathInfoActivity.class);
+                Intent intent = new Intent(MainActivity.this, RouteGuidancePagerActivity.class);
                 intent.putParcelableArrayListExtra("lessTransItems", lessTransItems);
                 intent.putExtra("lessTransInfo", lessTransInfo);
                 intent.putParcelableArrayListExtra("minDistItems", minDistItems);
@@ -374,7 +374,7 @@ public class MainActivity extends AppCompatActivity {
                 intent.putExtra("endStnNm", endStnNm);
                 intent.putExtra("favorite", favorite);
 
-                // PathInfoActivity 호출
+                // RouteGuidancePagerActivity 호출
                 MainActivity.this.startActivityForResult(intent, PATH_INFO_ACTIVITY_CODE);
             } else {
                 Toast.makeText(MainActivity.this, "출발역과 도착역을 다르게 설정해주세요", Toast.LENGTH_SHORT).show();
@@ -382,8 +382,8 @@ public class MainActivity extends AppCompatActivity {
 
             /* '경로 안내 액티비티'를 호출하고 다시 MainActivity로 돌아왔을 때,
              * 출발역, 도착역, 경유역을 새롭게 입력할 수 있도록 null로 초기화한다   */
-            subwayMapTouchPosition.startStn = null;
-            subwayMapTouchPosition.endStn = null;
+            subwayMapTouchPoint.startStn = null;
+            subwayMapTouchPoint.endStn = null;
 
             return null;
         }
@@ -418,8 +418,8 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            SharedPreferences temp_transStnPref = getSharedPreferences(TransferStnSettingActivity.TEMP_SETTING, MODE_PRIVATE);
-            Set<String> values = temp_transStnPref.getStringSet(TransferStnSettingActivity.TRANS_STN, null);
+            SharedPreferences temp_transStnPref = getSharedPreferences(SettingsActivity.TEMP_SETTING, MODE_PRIVATE);
+            Set<String> values = temp_transStnPref.getStringSet(SettingsActivity.TRANS_STN, null);
             boolean dijkstraError = false;
             n = stationMatrix.getN();
             mMatrix = new int[n][n];
@@ -438,8 +438,8 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 // 가상시작점, 가상종료점에 대한 임시값 (없으면 found[]에서 OutOfIndexException 발생)
-                ArrayList<Integer> startIdxs = subwayMapTouchPosition.getIdxs(stnIdx, stnIdx.get(0)); //소요산
-                ArrayList<Integer> endIdxs = subwayMapTouchPosition.getIdxs(stnIdx, stnIdx.get(1)); //동두천
+                ArrayList<Integer> startIdxs = subwayMapTouchPoint.getIndexes(stnIdx, stnIdx.get(0)); //소요산
+                ArrayList<Integer> endIdxs = subwayMapTouchPoint.getIndexes(stnIdx, stnIdx.get(1)); //동두천
                 setVirtualNodes(startIdxs, endIdxs);
 
                 // 다익스트라 테스트
@@ -450,9 +450,9 @@ public class MainActivity extends AppCompatActivity {
                     stationMatrix.initMatrix(mMatrix);
 
                     // 확정된 SharedPreference 저장
-                    SharedPreferences transStnPref = getSharedPreferences(TransferStnSettingActivity.SETTING, MODE_PRIVATE);
+                    SharedPreferences transStnPref = getSharedPreferences(SettingsActivity.SETTING, MODE_PRIVATE);
                     SharedPreferences.Editor editor = transStnPref.edit();
-                    editor.putStringSet(TransferStnSettingActivity.TRANS_STN, values);
+                    editor.putStringSet(SettingsActivity.TRANS_STN, values);
                     editor.apply();
                 } catch (ArrayIndexOutOfBoundsException e) { //다익스트라 테스트 실패!!
                     dijkstraError = true;
@@ -482,7 +482,7 @@ public class MainActivity extends AppCompatActivity {
                 builder.setMessage(R.string.trans_stn_setting_err_msg);
                 builder.setPositiveButton(R.string.trans_stn_setting_dialog_confirm, (dialog, which) -> {
                     dialog.dismiss();
-                    Intent intent = new Intent(MainActivity.this, TransferStnSettingActivity.class);
+                    Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
                     startActivityForResult(intent, TRANS_SETTING_ACTIVITY_CODE);
                 });
                 alertDialog = builder.create();
@@ -556,7 +556,7 @@ public class MainActivity extends AppCompatActivity {
         private ViewGroup.LayoutParams params =
                 new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         private Context context;
-        private int id = R.layout.item_search_list;
+        private int id = R.layout.item_station;
         private ArrayList<MyItem> myItems = new ArrayList<>();
 
         SearchListAdapter(Context context) {
@@ -611,7 +611,7 @@ public class MainActivity extends AppCompatActivity {
             MyItem stn = myItems.get(position);
             for (String lineNm : stn.lienNms) {
                 ImageView imageView = new ImageView(context);
-                imageView.setImageResource(LineInfo.getResId(lineNm));
+                imageView.setImageResource(SubwayLine.getResId(lineNm));
                 holder.lineSymLayout.addView(imageView, params);
             }
             holder.stnNm.setText(stn.stnNm);
@@ -651,7 +651,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onViewTap(View view, float x, float y) {
             // 터치한 좌표(x,y)를 사용하여 'stn 객체'에 터치한 역의 정보(StnPoint: 터치좌표, 역호선, 역이름)를 저장한다
-            StnInfo stn = subwayMapTouchPosition.getStn(
+            Station stn = subwayMapTouchPoint.getStation(
                     stnIdx,
                     lineMapView.getDisplayRect().left, lineMapView.getDisplayRect().top,
                     lineMapView.getScale(), x, y);
@@ -679,7 +679,7 @@ public class MainActivity extends AppCompatActivity {
             searchListAdapter.clear();
             if (mText.equals(""))
                 return false;
-            for (StnInfo stn : stnIdx)
+            for (Station stn : stnIdx)
                 if (stn.getStnNm().startsWith(mText))
                     searchListAdapter.add(stn.getLineNm(), stn.getStnNm(), stn.getPointx(), stn.getPointy());
             searchList.setAdapter(searchListAdapter); //리스트뷰 갱신
@@ -693,8 +693,8 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             String stnNm = searchListAdapter.getItem(position).getStnNm();
-            StnInfo mStn = null;
-            for (StnInfo stn : stnIdx)
+            Station mStn = null;
+            for (Station stn : stnIdx)
                 if (stnNm.equals(stn.getStnNm()))
                     mStn = stn;
 

@@ -19,29 +19,31 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import blacksmith.sullivanway.R;
-import blacksmith.sullivanway.utils.LineInfo;
-import blacksmith.sullivanway.database.CongestionInfo;
-import blacksmith.sullivanway.database.EvInfo;
-import blacksmith.sullivanway.database.StnInfo;
+import blacksmith.sullivanway.database.Congestion;
+import blacksmith.sullivanway.database.Elevator;
+import blacksmith.sullivanway.database.Station;
+import blacksmith.sullivanway.utils.SubwayLine;
 
 public class StnInfoFragment extends Fragment {
-    private StnInfo stn;
-    private CongestionInfo congestionInfo;
-    private ArrayList<EvInfo> evInfos;
+    private Station stn;
+    private Congestion congestion;
+    private ArrayList<Elevator> elevators;
     private int bgResId;
 
     /* View */
-    private StnInfoMapFragment mapFragment;
+    private NaverMapFragment mapFragment;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         Bundle bundle = getArguments();
-        stn = bundle.getParcelable("StnInfo"); //역 정보
-        congestionInfo = bundle.getParcelable("CongestionInfo"); //혼잡도
-        evInfos = bundle.getParcelableArrayList("EvInfos"); //엘리베이터
-        bgResId = LineInfo.getBgResId(stn.getLineNm());
+        if (bundle != null) {
+            stn = bundle.getParcelable("Station"); //역 정보
+            congestion = bundle.getParcelable("Congestion"); //혼잡도
+            elevators = bundle.getParcelableArrayList("EvInfos"); //엘리베이터
+            bgResId = SubwayLine.getBgResId(stn.getLineNm());
+        }
     }
 
     @Override
@@ -82,11 +84,11 @@ public class StnInfoFragment extends Fragment {
 
             // 주변지도
             FragmentTransaction ft = getChildFragmentManager().beginTransaction();
-            mapFragment = new StnInfoMapFragment();
+            mapFragment = new NaverMapFragment();
             Bundle mapBundle = new Bundle();
             mapBundle.putDouble("latitude", stn.getWgsy());
             mapBundle.putDouble("longitude", stn.getWgsx());
-            mapBundle.putParcelableArrayList("EvInfos", evInfos);
+            mapBundle.putParcelableArrayList("EvInfos", elevators);
             mapFragment.setArguments(mapBundle);
             ft.replace(R.id.mapContainer, mapFragment);
             ft.commit();
@@ -99,18 +101,18 @@ public class StnInfoFragment extends Fragment {
             // 혼잡도
             TextView congstnBtn = view.findViewById(R.id.cngstnBtn);
             congstnBtn.setOnClickListener(v -> {
-                Intent intent = new Intent(getActivity(), CongestionActivity.class);
+                Intent intent = new Intent(getActivity(), CongestionGraphActivity.class);
                 intent.putExtra("lineNm", stn.getLineNm());
                 intent.putExtra("stnNm", stn.getStnNm());
                 intent.putExtra("bgResId", bgResId);
-                intent.putExtra("CongestionInfo", congestionInfo);
+                intent.putExtra("Congestion", congestion);
                 getActivity().startActivity(intent);
             });
 
             // 시간표
             TextView timeTableBtn = view.findViewById(R.id.timetableBtn);
             timeTableBtn.setOnClickListener(v -> {
-                Intent intent = new Intent(getActivity(), TimeTableActivity.class);
+                Intent intent = new Intent(getActivity(), TimeTablePagerActivity.class);
                 intent.putExtra("lineNm", stn.getLineNm());
                 intent.putExtra("stnNm", stn.getStnNm());
                 intent.putExtra("bgResId", bgResId);
@@ -120,7 +122,7 @@ public class StnInfoFragment extends Fragment {
 
     }
 
-    public StnInfoMapFragment getMapFragment() {
+    public NaverMapFragment getMapFragment() {
         return mapFragment;
     }
 
@@ -132,12 +134,12 @@ public class StnInfoFragment extends Fragment {
                 case MotionEvent.ACTION_DOWN:
                     return true;
                 case MotionEvent.ACTION_UP:
-                    Intent intent = new Intent(getActivity(), StnInfoMapActivity.class);
+                    Intent intent = new Intent(getActivity(), ExpandedNaverMapActivity.class);
                     intent.putExtra("lineNm", stn.getLineNm());
                     intent.putExtra("stnNm", stn.getStnNm());
                     intent.putExtra("latitude", stn.getWgsy());
                     intent.putExtra("longitude", stn.getWgsx());
-                    intent.putParcelableArrayListExtra("EvInfos", evInfos);
+                    intent.putParcelableArrayListExtra("EvInfos", elevators);
                     intent.putExtra("bgResId", bgResId);
                     startActivity(intent);
                     return true;

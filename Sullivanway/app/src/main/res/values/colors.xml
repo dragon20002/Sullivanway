@@ -10,23 +10,23 @@
     <color name="list_bg">#ffffff</color>
     <color name="selectedStnTextViewBg">#ffffff</color>
 
-    <!-- activity_path_info.xml -->
+    <!-- activity_route_guidance_pager.xml -->
     <color name="favoriteTint">#faf2dd1d</color>
 
-    <!-- activity_transfer_map_view.xml -->
+    <!-- activity_transfer_map_pager.xml -->
     <color name="topTint">#e2e2e2</color>
-    <color name="trans_map_text_color">#ffffff</color>
+    <color name="transfer_map_text_color">#ffffff</color>
 
-    <!-- dialog_station_touch.xml -->
-    <color name="stn_touch_icon">#ffd988</color>
+    <!-- dialog_station_menu.xml -->
+    <color name="station_menu_icon">#ffd988</color>
 
     <!-- fragment_map_view -->
-    <color name="trans_map_bg">#c6fdfdfd</color>
+    <color name="transfer_map_bg">#c6fdfdfd</color>
 
     <!-- activity_trans_stn_setting.xml -->
-    <color name="trans_stn_appbar_text">#ffffff</color>
-    <color name="trans_stn_btn_bg">#cfcfcf</color>
-    <color name="stn_info_map_appbar_text">#ffffff</color>
+    <color name="transfer_stn_appbar_text">#ffffff</color>
+    <color name="transfer_stn_btn_bg">#cfcfcf</color>
+    <color name="expanded_naver_map_appbar_text">#ffffff</color>
 
     <!-- activity dialog -->
     <color name="confirm_text_color">#737373</color>

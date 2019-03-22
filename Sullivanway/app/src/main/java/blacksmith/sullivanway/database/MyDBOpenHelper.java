@@ -25,42 +25,42 @@ public class MyDBOpenHelper extends SQLiteOpenHelper {
     }
 
     private void createTables(SQLiteDatabase db) {
-        db.execSQL(CongestionInfo.SQL_CREATE);
-        db.execSQL(EvInfo.SQL_CREATE);
-        db.execSQL(FavoritePath.SQL_CREATE);
-        db.execSQL(InoutInfo.SQL_CREATE);
-        db.execSQL(StnInfo.SQL_CREATE);
-        db.execSQL(TransInfo.SQL_CREATE);
-        db.execSQL(TransMap.SQL_CREATE);
+        db.execSQL(Congestion.SQL_CREATE);
+        db.execSQL(Elevator.SQL_CREATE);
+        db.execSQL(FavoriteRoute.SQL_CREATE);
+        db.execSQL(DownLine.SQL_CREATE);
+        db.execSQL(Station.SQL_CREATE);
+        db.execSQL(Transfer.SQL_CREATE);
+        db.execSQL(TransferMap.SQL_CREATE);
     }
 
     private void dropTables(SQLiteDatabase db) {
-        db.execSQL(CongestionInfo.SQL_DROP);
-        db.execSQL(EvInfo.SQL_DROP);
-        db.execSQL(FavoritePath.SQL_DROP);
-        db.execSQL(InoutInfo.SQL_DROP);
-        db.execSQL(StnInfo.SQL_DROP);
-        db.execSQL(TransInfo.SQL_DROP);
-        db.execSQL(TransMap.SQL_DROP);
+        db.execSQL(Congestion.SQL_DROP);
+        db.execSQL(Elevator.SQL_DROP);
+        db.execSQL(FavoriteRoute.SQL_DROP);
+        db.execSQL(DownLine.SQL_DROP);
+        db.execSQL(Station.SQL_DROP);
+        db.execSQL(Transfer.SQL_DROP);
+        db.execSQL(TransferMap.SQL_DROP);
     }
 
     public void initDatabase(SQLiteDatabase db, boolean retry) {
         try {
             // 데이터 삭제&재삽입
-            db.execSQL(CongestionInfo.SQL_DELETE_ALL);
-            db.execSQL(EvInfo.SQL_DELETE_ALL);
-            db.execSQL(FavoritePath.SQL_DELETE_ALL);
-            db.execSQL(InoutInfo.SQL_DELETE_ALL);
-            db.execSQL(StnInfo.SQL_DELETE_ALL);
-            db.execSQL(TransInfo.SQL_DELETE_ALL);
-            db.execSQL(TransMap.SQL_DELETE_ALL);
+            db.execSQL(Congestion.SQL_DELETE_ALL);
+            db.execSQL(Elevator.SQL_DELETE_ALL);
+            db.execSQL(FavoriteRoute.SQL_DELETE_ALL);
+            db.execSQL(DownLine.SQL_DELETE_ALL);
+            db.execSQL(Station.SQL_DELETE_ALL);
+            db.execSQL(Transfer.SQL_DELETE_ALL);
+            db.execSQL(TransferMap.SQL_DELETE_ALL);
 
-            CongestionInfo.initDatabase();
-            EvInfo.initDatabase();
-            InoutInfo.initDatabase();
-            StnInfo.initDatabase();
-            TransInfo.initDatabase();
-            TransMap.initDatabase();
+            Congestion.initDatabase();
+            Elevator.initDatabase();
+            DownLine.initDatabase();
+            Station.initDatabase();
+            Transfer.initDatabase();
+            TransferMap.initDatabase();
         } catch (SQLiteException e) {
             if (retry) {
                 // 테이블 삭제&재생성
@@ -78,12 +78,12 @@ public class MyDBOpenHelper extends SQLiteOpenHelper {
     }
 
     public void setDatabase(SQLiteDatabase db) {
-        CongestionInfo.setDatabase(db);
-        EvInfo.setDatabase(db);
-        FavoritePath.setDatabase(db);
-        InoutInfo.setDatabase(db);
-        StnInfo.setDatabase(db);
-        TransInfo.setDatabase(db);
-        TransMap.setDatabase(db);
+        Congestion.setDatabase(db);
+        Elevator.setDatabase(db);
+        FavoriteRoute.setDatabase(db);
+        DownLine.setDatabase(db);
+        Station.setDatabase(db);
+        Transfer.setDatabase(db);
+        TransferMap.setDatabase(db);
     }
 }

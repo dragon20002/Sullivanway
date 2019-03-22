@@ -36,50 +36,46 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.StnInfoActivity"
+            android:name=".activity.StnInfoPagerActivity"
             android:parentActivityName=".activity.MainActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.StnInfoMapActivity"
-            android:parentActivityName=".activity.StnInfoActivity"
+            android:name=".activity.ExpandedNaverMapActivity"
+            android:parentActivityName=".activity.StnInfoPagerActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.PathInfoActivity"
+            android:name=".activity.RouteGuidancePagerActivity"
             android:parentActivityName=".activity.MainActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.TransferMapNameListActivity"
+            android:name=".activity.TransferMapListActivity"
             android:parentActivityName=".activity.MainActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.TransferMapViewActivity"
+            android:name=".activity.TransferMapPagerActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.FavoriteActivity"
+            android:name=".activity.FavoriteRouteActivity"
             android:parentActivityName=".activity.MainActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.CongestionActivity"
-            android:parentActivityName=".activity.PathInfoActivity"
+            android:name=".activity.CongestionGraphActivity"
+            android:parentActivityName=".activity.RouteGuidancePagerActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.ActionBar" />
         <activity
-            android:name=".activity.TimeTableActivity"
-            android:parentActivityName=".activity.StnInfoActivity"
+            android:name=".activity.TimeTablePagerActivity"
+            android:parentActivityName=".activity.StnInfoPagerActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.TransferStnSettingActivity"
+            android:name=".activity.SettingsActivity"
             android:label="@string/trans_stn_setting_title"
             android:parentActivityName=".activity.MainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.ActionBar" />
 
-        <service android:name=".service.MyFirebaseInstanceIdService">
-            <intent-filter>
-                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
-            </intent-filter>
-        </service>
-        <service android:name=".service.MyFirebaseMessagingService">
+        <service android:name=".service.CloudMessagingService"
+            android:permission="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
@@ -89,10 +85,10 @@
 
         <!-- activity dialog -->
         <activity
-            android:name=".view.AlarmDialogActivity"
+            android:name=".dialog.AlarmDialogActivity"
             android:theme="@android:style/Theme.Translucent" />
         <activity
-            android:name=".view.FcmDialogActivtiy"
+            android:name=".dialog.CloudMessageDialogActivity"
             android:theme="@android:style/Theme.Translucent" />
 
     </application>

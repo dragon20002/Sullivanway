@@ -10,8 +10,8 @@ import android.support.v4.app.NotificationCompat;
 import android.widget.Toast;
 
 import blacksmith.sullivanway.R;
-import blacksmith.sullivanway.view.AlarmDialogActivity;
-import blacksmith.sullivanway.activity.PathInfoActivity;
+import blacksmith.sullivanway.activity.RouteGuidancePagerActivity;
+import blacksmith.sullivanway.dialog.AlarmDialogActivity;
 
 public class AlarmReceiver extends BroadcastReceiver {
     private final int REQUEST_CODE = 1;
@@ -72,9 +72,9 @@ public class AlarmReceiver extends BroadcastReceiver {
             }
 
             if (times.length > index+1)
-                new MyAlarmManager(context).alarmOn(times, stnNms, index+1);
+                new AlarmOnOffManager(context).alarmOn(times, stnNms, index+1);
             else
-                PathInfoActivity.isAlarmSet = false; //false 로 변경시 PathInfoActivity의 alarmView의 이미지가 변경된다
+                RouteGuidancePagerActivity.isAlarmSet = false; //false 로 변경시 PathInfoActivity의 alarmView의 이미지가 변경된다
         }
 
     }
