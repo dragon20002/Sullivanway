@@ -10,12 +10,13 @@ import blacksmith.sullivanway.database.Station;
 /**
  * RouteGuidancePagerActivity 에서 경로 계산 결과값을 출력할 데이터
  */
+@SuppressWarnings({"FieldCanBeLocal", "ResultOfMethodCallIgnored", "WeakerAccess"})
 public class Route implements Parcelable {
     private ArrayList<Integer> path = new ArrayList<>();
     private ArrayList<Integer> times = new ArrayList<>();
     private ArrayList<Integer> transStns = new ArrayList<>();
     private ArrayList<Integer> transTimes = new ArrayList<>();
-    private int time = 0, transCnt = 0;
+    private int time, transCnt;
     private int cost = 0;
 
     Route(ArrayList<Station> stnIdx, int[] distance, int[] prev, int start, int end) {

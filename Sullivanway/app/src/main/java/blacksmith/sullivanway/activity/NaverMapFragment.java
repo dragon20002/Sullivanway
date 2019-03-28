@@ -20,6 +20,7 @@ import com.nhn.android.maps.NMapView;
 import com.nhn.android.maps.maplib.NGeoPoint;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import blacksmith.sullivanway.R;
 import blacksmith.sullivanway.database.Elevator;
@@ -48,17 +49,20 @@ public class NaverMapFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         // 지도 실행 컨텍스트
-        mMapContext = new NMapContext(getActivity());
+        mMapContext = new NMapContext(Objects.requireNonNull(getActivity()));
         mMapContext.onCreate();
 
         Bundle bundle = getArguments();
+        if (bundle != null) {
+            // 위도, 경도
+            latitude = bundle.getDouble("latitude");
+            longitude = bundle.getDouble("longitude");
 
-        // 위도, 경도
-        latitude = bundle.getDouble("latitude");
-        longitude = bundle.getDouble("longitude");
-
-        // 엘리베이터
-        elevators = bundle.getParcelableArrayList("EvInfos");
+            // 엘리베이터
+            elevators = bundle.getParcelableArrayList("EvInfos");
+        } else {
+            elevators = new ArrayList<>();
+        }
     }
 
     @Override

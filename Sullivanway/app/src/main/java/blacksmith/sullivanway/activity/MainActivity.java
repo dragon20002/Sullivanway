@@ -5,14 +5,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,7 +27,6 @@ import android.widget.Toast;
 
 import com.github.chrisbanes.photoview.OnViewTapListener;
 import com.github.chrisbanes.photoview.PhotoView;
-import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -41,13 +38,18 @@ import blacksmith.sullivanway.R;
 import blacksmith.sullivanway.database.FavoriteRoute;
 import blacksmith.sullivanway.database.MyDBOpenHelper;
 import blacksmith.sullivanway.database.Station;
+import blacksmith.sullivanway.dialog.StationMenuDialog;
 import blacksmith.sullivanway.routeguidance.Route;
 import blacksmith.sullivanway.routeguidance.RouteFinder;
 import blacksmith.sullivanway.routeguidance.RouteWrapper;
 import blacksmith.sullivanway.routeguidance.StationMatrix;
 import blacksmith.sullivanway.utils.SubwayLine;
 import blacksmith.sullivanway.utils.SubwayMapTouchPoint;
-import blacksmith.sullivanway.dialog.StationMenuDialog;
+import io.reactivex.Completable;
+import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 import static android.view.View.GONE;
 import static java.lang.Thread.sleep;
@@ -63,11 +65,9 @@ public class MainActivity extends AppCompatActivity {
     private SubwayMapTouchPoint subwayMapTouchPoint;
     private SearchListAdapter searchListAdapter;
 
-    private static final String TAG = "MainActivity";
-
     private boolean isExit; //Back키 두번 누르면 종료
     private boolean isFabOpen; //FloatingAction Open/Close 여부
-    private Animation fab_open,fab_close,rotate_forward,rotate_backward; //FloatingAction 애니메이션
+    private Animation fab_open, fab_close, rotate_forward, rotate_backward; //FloatingAction 애니메이션
 
     // View
     private FloatingActionButton fab, fab_favorite, fab_trans_map, fab_settings; //FloatingActionButton
@@ -76,6 +76,11 @@ public class MainActivity extends AppCompatActivity {
     private ListView searchList;
     private TextView startStnTextView, endStnTextView;
     private StationMenuDialog dialog;
+
+    // Observables
+    private Disposable loadingDbTaskObs = null;
+    private Disposable findingRouteTaskObs = null;
+    private Disposable testingSettingTaskObs = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,10 +91,7 @@ public class MainActivity extends AppCompatActivity {
         }
         setContentView(R.layout.activity_main);
 
-        new DataLoadThread().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR); // 서브쓰레드를 만들어 지하철 데이터를 가져온다
-
-        String token = FirebaseInstanceId.getInstance().getToken();
-	    Log.d(TAG, "MainRefreshed token: " + token);
+        loadDatabaseAsync(); // 지하철 데이터를 가져온다. (비동기)
 
         isExit = false;
         isFabOpen = false;
@@ -115,10 +117,12 @@ public class MainActivity extends AppCompatActivity {
         startStnTextView = findViewById(R.id.startStnTextView);
         endStnTextView = findViewById(R.id.endStnTextView);
         startStnTextView.setOnClickListener(v -> {
-            v.setVisibility(GONE);  subwayMapTouchPoint.startStn = null;
+            v.setVisibility(GONE);
+            subwayMapTouchPoint.startStn = null;
         });
         endStnTextView.setOnClickListener(v -> {
-            v.setVisibility(GONE);  subwayMapTouchPoint.endStn = null;
+            v.setVisibility(GONE);
+            subwayMapTouchPoint.endStn = null;
         });
 
         // activity_main 의 플로팅 액션 버튼 동그라미
@@ -176,6 +180,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onDestroy() {
+        if (loadingDbTaskObs != null)
+            loadingDbTaskObs.dispose();
+        if (findingRouteTaskObs != null)
+            findingRouteTaskObs.dispose();
+        if (testingSettingTaskObs != null)
+            testingSettingTaskObs.dispose();
+        super.onDestroy();
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
@@ -187,12 +202,12 @@ public class MainActivity extends AppCompatActivity {
                     subwayMapTouchPoint.endStn = subwayMapTouchPoint.getStation(stnIdx, data.getStringExtra("endLineNm"), data.getStringExtra("endStnNm"));
 
                     // 경로 계산 쓰레드 실행
-                    new PathFinderThread().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                    findRouteAsync();
                     break;
 
                 case TRANS_SETTING_ACTIVITY_CODE:
                     // 환승제한역 설정 테스트 쓰레드 실행
-                    new SettingTestThread().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                    testSettingAsync();
                     break;
                 default:
             }
@@ -248,15 +263,15 @@ public class MainActivity extends AppCompatActivity {
 
             /* 출발역(startStn), 도착역(endStn) 모두 입력되었다면,
                경로탐색 쓰레드 실행 **/
-            new PathFinderThread().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            findRouteAsync();
             dialog.cancel();
         });
         dialog.show(); //dialog를 보여준다
     }
 
     // FloatingAction 애니메이션 Open/Close
-    private void animateFAB(){
-        if(isFabOpen){
+    private void animateFAB() {
+        if (isFabOpen) {
             fab.startAnimation(rotate_backward);
             fab_favorite.startAnimation(fab_close);
             fab_trans_map.startAnimation(fab_close);
@@ -278,12 +293,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    // 지하철 데이터를 가져오는 AsyncTask
-    private class DataLoadThread extends AsyncTask<Void, Void, Void> {
-        private ProgressDialog dialog = new ProgressDialog(MainActivity.this);
+    // 지하철 데이터를 가져오는 Task
+    private void loadDatabaseAsync() {
+        ProgressDialog dialog = new ProgressDialog(MainActivity.this);
+        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        dialog.setMessage("지하철역 정보를 가져오는 중..");
+        dialog.setCancelable(false); //화면터치로 인해 Task가 중단되지 않도록 설정
+        dialog.show();
 
-        @Override
-        protected Void doInBackground(Void... params) {
+        Completable loadingDbTask$ = Completable.create(emitter -> {
             // Preference로 이전 DB 상태를 받아온다. 정상: true, 비정상: false
             // state: Preference 파일이름 ex. state.xml
             // isDbValid: state.xml의 태그. isDbValid 값을 갖는다
@@ -310,33 +328,31 @@ public class MainActivity extends AppCompatActivity {
             editor.putBoolean("isDbValid", true);
             editor.apply();
 
-            return null;
-        }
+            emitter.onComplete();
+        });
 
-        @Override
-        protected void onPreExecute() {
-            dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            dialog.setMessage("지하철역 정보를 가져오는 중..");
-            dialog.setCancelable(false); //화면터치로 인해 Task가 중단되지 않도록 설정
-            dialog.show();
-
-            super.onPreExecute();
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            dialog.dismiss();
-            new SettingTestThread().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR); //StationMatirx 생성 후 데이터를 점검한다
-            super.onPostExecute(aVoid);
-        }
+        loadingDbTaskObs = loadingDbTask$
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(
+                        () -> {
+                            loadingDbTaskObs = null;
+                            dialog.dismiss();
+                            // StationMatirx 생성 후 데이터를 점검한다
+                            testSettingAsync();
+                        }
+                );
     }
 
-    // 경로 계산하는 AsyncTask
-    private class PathFinderThread extends AsyncTask<Void, Void, Void> {
-        private ProgressDialog dialog = new ProgressDialog(MainActivity.this);
+    // 경로 계산하는 Task
+    private void findRouteAsync() {
+        ProgressDialog dialog = new ProgressDialog(MainActivity.this);
+        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        dialog.setMessage("경로 탐색중..");
+        dialog.setCancelable(false); //화면터치로 인해 Task가 중단되지 않도록 설정
+        dialog.show();
 
-        @Override
-        protected Void doInBackground(Void... params) {
+        Completable findingRouteTask$ = Completable.create(emitter -> {
             /* SubwayMapTouchPoint map의 startStn, endStn을
              * 경로정보액티비티에서 사용할 수 있도록 intent에 저장한다  **/
             if (Station.compare(subwayMapTouchPoint.startStn, subwayMapTouchPoint.endStn) == 2) { //출발역과 도착역이 다를 때
@@ -385,44 +401,36 @@ public class MainActivity extends AppCompatActivity {
             subwayMapTouchPoint.startStn = null;
             subwayMapTouchPoint.endStn = null;
 
-            return null;
-        }
+            emitter.onComplete();
+        });
 
-        @Override
-        protected void onPreExecute() {
-            dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            dialog.setMessage("경로 탐색중..");
-            dialog.setCancelable(false); //화면터치로 인해 Task가 중단되지 않도록 설정
-            dialog.show();
-
-            super.onPreExecute();
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            dialog.dismiss();
-
-            startStnTextView.setVisibility(GONE);
-            endStnTextView.setVisibility(GONE);
-
-            super.onPostExecute(aVoid);
-        }
-
+        findingRouteTaskObs = findingRouteTask$
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(
+                        () -> {
+                            findingRouteTaskObs = null;
+                            dialog.dismiss();
+                            startStnTextView.setVisibility(GONE);
+                            endStnTextView.setVisibility(GONE);
+                        }
+                );
     }
 
-    // 환승제한역 설정 저장하는 AsyncTask
-    private class SettingTestThread extends AsyncTask<Void, Void, Boolean> {
-        private int[][] mMatrix;
-        private int n;
-        private ProgressDialog dialog = new ProgressDialog(MainActivity.this);
+    // 환승제한역 설정 저장하는 Task
+    private void testSettingAsync() {
+        ProgressDialog dialog = new ProgressDialog(MainActivity.this);
+        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        dialog.setMessage("설정 적용 중..");
+        dialog.setCancelable(false); //화면터치로 인해 Task가 중단되지 않도록 설정
+        dialog.show();
 
-        @Override
-        protected Boolean doInBackground(Void... params) {
+        Single<Boolean> testingSettingTask$ = Single.create(emitter -> {
             SharedPreferences temp_transStnPref = getSharedPreferences(SettingsActivity.TEMP_SETTING, MODE_PRIVATE);
             Set<String> values = temp_transStnPref.getStringSet(SettingsActivity.TRANS_STN, null);
             boolean dijkstraError = false;
-            n = stationMatrix.getN();
-            mMatrix = new int[n][n];
+            int n = stationMatrix.getN();
+            int[][] mMatrix = new int[n][n];
             int[][] rawMatrix = stationMatrix.getRawMatrix();
             for (int i = 0; i < n; i++)
                 mMatrix[i] = rawMatrix[i].clone();
@@ -440,11 +448,11 @@ public class MainActivity extends AppCompatActivity {
                 // 가상시작점, 가상종료점에 대한 임시값 (없으면 found[]에서 OutOfIndexException 발생)
                 ArrayList<Integer> startIdxs = subwayMapTouchPoint.getIndexes(stnIdx, stnIdx.get(0)); //소요산
                 ArrayList<Integer> endIdxs = subwayMapTouchPoint.getIndexes(stnIdx, stnIdx.get(1)); //동두천
-                setVirtualNodes(startIdxs, endIdxs);
+                setVirtualNodes(mMatrix, n, startIdxs, endIdxs);
 
                 // 다익스트라 테스트
                 try {
-                    testDijkstra(n - 2);
+                    testDijkstra(mMatrix, n - 2);
 
                     // stationMatrix의 matrix, transMatrix 수정
                     stationMatrix.initMatrix(mMatrix);
@@ -459,94 +467,85 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
-            return dijkstraError;
-        }
+            emitter.onSuccess(dijkstraError);
+        });
 
-        @Override
-        protected void onPreExecute() {
-            dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            dialog.setMessage("설정 적용 중..");
-            dialog.setCancelable(false); //화면터치로 인해 Task가 중단되지 않도록 설정
-            dialog.show();
-
-            super.onPreExecute();
-        }
-
-        @Override
-        protected void onPostExecute(Boolean dijkstraError) {
-            dialog.dismiss();
-
-            if (dijkstraError) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                AlertDialog alertDialog;
-                builder.setMessage(R.string.trans_stn_setting_err_msg);
-                builder.setPositiveButton(R.string.trans_stn_setting_dialog_confirm, (dialog, which) -> {
+        testingSettingTaskObs = testingSettingTask$
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(dijkstraError -> {
+                    testingSettingTaskObs = null;
                     dialog.dismiss();
-                    Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
-                    startActivityForResult(intent, TRANS_SETTING_ACTIVITY_CODE);
+
+                    if (dijkstraError) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                        AlertDialog alertDialog;
+                        builder.setMessage(R.string.trans_stn_setting_err_msg);
+                        builder.setPositiveButton(R.string.trans_stn_setting_dialog_confirm, (d, w) -> {
+                            d.dismiss();
+                            Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                            startActivityForResult(intent, TRANS_SETTING_ACTIVITY_CODE);
+                        });
+                        alertDialog = builder.create();
+                        alertDialog.setCancelable(false);
+                        alertDialog.show();
+                    }
                 });
-                alertDialog = builder.create();
-                alertDialog.setCancelable(false);
-                alertDialog.show();
-            }
+    }
 
-            super.onPostExecute(dijkstraError);
+    private void setVirtualNodes(int[][] matrix, int n, ArrayList<Integer> startLineIdxs, ArrayList<Integer> endLineIdxs) {
+        // 초기화
+        int start = n - 2, end = n - 1;
+        for (int i = 0; i < n; i++) {
+            matrix[i][start] = StationMatrix.INF;
+            matrix[start][i] = StationMatrix.INF;
         }
+        matrix[start][start] = 0;
+        for (int i = 0; i < n; i++) {
+            matrix[i][end] = StationMatrix.INF;
+            matrix[end][i] = StationMatrix.INF;
+        }
+        matrix[end][end] = 0;
+        // 가상시작점, 가상도착점 설정
+        for (int i : startLineIdxs) {
+            matrix[i][start] = 0;
+            matrix[start][i] = 0;
+        }
+        for (int i : endLineIdxs) {
+            matrix[i][end] = 0;
+            matrix[end][i] = 0;
+        }
+    }
 
-        private void setVirtualNodes(ArrayList<Integer> startLineIdxs, ArrayList<Integer> endLineIdxs) {
-            // 초기화
-            int start = n - 2, end = n - 1;
-            for (int i = 0; i < n; i++) {
-                mMatrix[i][start] = StationMatrix.INF;
-                mMatrix[start][i] = StationMatrix.INF;
-            }
-            mMatrix[start][start] = 0;
-            for (int i = 0; i < n; i++) {
-                mMatrix[i][end] = StationMatrix.INF;
-                mMatrix[end][i] = StationMatrix.INF;
-            }
-            mMatrix[end][end] = 0;
-            // 가상시작점, 가상도착점 설정
-            for (int i : startLineIdxs) {
-                mMatrix[i][start] = 0;
-                mMatrix[start][i] = 0;
-            }
-            for (int i : endLineIdxs) {
-                mMatrix[i][end] = 0;
-                mMatrix[end][i] = 0;
+    private int choose(int[] distance, boolean[] found) {
+        int min = StationMatrix.INF;
+        int choose = -1;
+
+        for (int i = 0; i < distance.length; i++) {
+            if (!found[i] && distance[i] < min) {
+                min = distance[i];
+                choose = i;
             }
         }
+        return choose;
+    }
 
-        private int choose(int[] distance, boolean[] found) {
-            int min = StationMatrix.INF;
-            int choose = -1;
+    private void testDijkstra(int[][] matrix, int start) {
+        // 초기화
+        int[] distance = matrix[start].clone();
+        int n = distance.length;
+        boolean[] found = new boolean[n];
+        for (int i = 0; i < n; i++)
+            found[i] = false;
+        found[start] = true;
 
-            for (int i = 0; i < distance.length; i++) {
-                if (!found[i] && distance[i] < min) {
-                    min = distance[i];
-                    choose = i;
-                }
-            }
-            return choose;
-        }
-
-        private void testDijkstra(int start) {
-            // 초기화
-            int[] distance = mMatrix[start].clone();
-            int n = distance.length;
-            boolean[] found = new boolean[n];
+        int loop = n - 1;
+        while (loop-- != 0) {
+            int choose = choose(distance, found);
+            found[choose] = true;
             for (int i = 0; i < n; i++)
-                found[i] = false;
-            found[start] = true;
-
-            int loop = n - 1;
-            while (loop-- != 0) {
-                int choose = choose(distance, found);
-                found[choose] = true;
-                for (int i = 0; i < n; i++)
-                    if (!found[i] && distance[choose] + mMatrix[choose][i] < distance[i])
-                        distance[i] = distance[choose] + mMatrix[choose][i];
-            }
+                if (!found[i] && distance[choose] + matrix[choose][i] < distance[i])
+                    distance[i] = distance[choose] + matrix[choose][i];
         }
     }
 

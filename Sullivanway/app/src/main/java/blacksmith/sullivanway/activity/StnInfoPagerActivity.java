@@ -28,7 +28,6 @@ public class StnInfoPagerActivity extends AppCompatActivity {
     /* View */
     private ViewPager viewPager;
 
-    @SuppressWarnings("unchecked")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,6 +39,7 @@ public class StnInfoPagerActivity extends AppCompatActivity {
 
         SQLiteDatabase db = myDBOpenHelper.getReadableDatabase();
         String stnNm = getIntent().getStringExtra("stnNm");
+        @SuppressWarnings("unchecked")
         ArrayList<String> lines = (ArrayList<String>) getIntent().getSerializableExtra("lines");
         //lines에는 stnNm역에서 탑승가능한 모든 호선이 저장되어 있다.
         //SELECT문에서 lines.get(0), lines.get(1) 등 으로 각 호선의 stnNm역을 검색할 수 있다
@@ -148,9 +148,11 @@ public class StnInfoPagerActivity extends AppCompatActivity {
         @Override
         public void onPageSelected(int position) {
             MyPagerAdapter adapter = (MyPagerAdapter) viewPager.getAdapter();
-            StnInfoFragment fragment = (StnInfoFragment) adapter.getItem(position);
-            NaverMapFragment mapFragment = fragment.getMapFragment();
-            mapFragment.setMapCenter();
+            if (adapter != null) {
+                StnInfoFragment fragment = (StnInfoFragment) adapter.getItem(position);
+                NaverMapFragment mapFragment = fragment.getMapFragment();
+                mapFragment.setMapCenter();
+            }
         }
 
         @Override

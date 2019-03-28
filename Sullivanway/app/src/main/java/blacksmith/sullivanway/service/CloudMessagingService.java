@@ -42,7 +42,7 @@ public class CloudMessagingService extends FirebaseMessagingService {
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
         Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, "miscellaneous")
                 .setSmallIcon(R.mipmap.sullivanway_launcher_round)
                 .setContentTitle("Sullivanway 알림")
                 .setContentText(messageBody)

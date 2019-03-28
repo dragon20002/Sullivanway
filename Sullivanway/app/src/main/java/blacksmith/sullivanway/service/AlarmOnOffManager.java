@@ -7,8 +7,6 @@ import android.content.Intent;
 
 import java.util.Calendar;
 
-import blacksmith.sullivanway.service.AlarmReceiver;
-
 public class AlarmOnOffManager {
     private final int REQUEST_CODE = 0;
 

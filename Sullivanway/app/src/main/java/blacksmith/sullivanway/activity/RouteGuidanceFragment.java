@@ -10,7 +10,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -22,12 +21,12 @@ import java.util.ArrayList;
 
 import blacksmith.sullivanway.R;
 import blacksmith.sullivanway.database.Elevator;
-import blacksmith.sullivanway.routeguidance.Route;
-import blacksmith.sullivanway.utils.SubwayLine;
 import blacksmith.sullivanway.database.MyDBOpenHelper;
 import blacksmith.sullivanway.database.Station;
 import blacksmith.sullivanway.database.TransferMap;
+import blacksmith.sullivanway.routeguidance.Route;
 import blacksmith.sullivanway.routeguidance.RouteWrapper;
+import blacksmith.sullivanway.utils.SubwayLine;
 
 public class RouteGuidanceFragment extends Fragment {
     private SQLiteDatabase db;
@@ -80,15 +79,15 @@ public class RouteGuidanceFragment extends Fragment {
             else
                 totalTimeView.setText(String.format(MainActivity.DEFAULT_LOCALE, "%d시간 %d분 소요", time / 60, time % 60));
             transCntView.setText(String.format(MainActivity.DEFAULT_LOCALE, "%d회 환승", transCnt));
-            //costView.setText(String.format(MainActivity.DEFAULT_LOCALE, "%d 원", cost));
+            costView.setText(String.format(MainActivity.DEFAULT_LOCALE, "%d 원", cost));
 
             // 경로 리스트뷰 표시
-            PathInfoAdapter adapter = new PathInfoAdapter(getActivity(), items);
+            RouteGuidanceAdapter adapter = new RouteGuidanceAdapter(getActivity(), items);
             pathList.setAdapter(adapter);
         }
     }
 
-    private class PathInfoAdapter extends BaseAdapter {
+    private class RouteGuidanceAdapter extends BaseAdapter {
         private static final int NUM_OF_ITEMS = 2;
         private static final int TYPE1 = 0;
         //private static final int TYPE2 = 1;
@@ -99,7 +98,7 @@ public class RouteGuidanceFragment extends Fragment {
         private int[] id = { R.layout.item_route_subway_section, R.layout.item_route_walking_section};
         private ArrayList<RouteWrapper> items;
 
-        private PathInfoAdapter(Context context, ArrayList<RouteWrapper> items) {
+        private RouteGuidanceAdapter(Context context, ArrayList<RouteWrapper> items) {
             this.context = context;
             this.items = items;
         }
@@ -136,7 +135,7 @@ public class RouteGuidanceFragment extends Fragment {
             // Holder 생성 or ConvertView로부터 받아오기
             if (convertView == null) {
                 LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                holder = new PathInfoAdapter.Holder();
+                holder = new RouteGuidanceAdapter.Holder();
                 if (itemType == TYPE1) {
                     convertView = inflater.inflate(id[0], parent, false);
                     holder.startCircle = convertView.findViewById(R.id.startCircle);
@@ -161,7 +160,7 @@ public class RouteGuidanceFragment extends Fragment {
                 }
                 convertView.setTag(holder);
             } else {
-                holder = (PathInfoAdapter.Holder) convertView.getTag();
+                holder = (RouteGuidanceAdapter.Holder) convertView.getTag();
             }
 
             // Holder의 View에 값 설정
@@ -188,9 +187,9 @@ public class RouteGuidanceFragment extends Fragment {
                 holder.endStnNm.setText(endStnNm);
                 holder.door.setText(String.format("내리는 문: %s", items.get(position).door));
 
-                holder.startStnNm.setOnTouchListener(new OnStnNmTouch(lineNm, startStnNm));
-                holder.endStnNm.setOnTouchListener(new OnStnNmTouch(lineNm, endStnNm));
-            } else {
+                holder.startStnNm.setOnClickListener(new OnStnNmClick(lineNm, startStnNm));
+                holder.endStnNm.setOnClickListener(new OnStnNmClick(lineNm, endStnNm));
+            } else { //TYPE2
                 String transStnNm = items.get(position).transStnNm;
                 String transStartLineNm = items.get(position).transStartLineNm;
                 String transStartNextStnNm = items.get(position).transStartNextStnNm;
@@ -238,37 +237,27 @@ public class RouteGuidanceFragment extends Fragment {
             ImageView walkImage, transMap;
             TextView remainWalkTime;
         }
-
     }
 
     /* Listener */
-    private class OnStnNmTouch implements View.OnTouchListener {
+    private class OnStnNmClick implements View.OnClickListener {
         private String lineNm;
         private String stnNm;
 
-        private OnStnNmTouch(String lineNm, String stnNm) {
+        private OnStnNmClick(String lineNm, String stnNm) {
             this.lineNm = lineNm;
             this.stnNm = stnNm;
         }
 
         @Override
-        public boolean onTouch(View view, MotionEvent event) {
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    return true;
-                case MotionEvent.ACTION_UP:
-                    Intent intent = new Intent(RouteGuidanceFragment.this.getActivity(), StnInfoPagerActivity.class);
-                    intent.putExtra("lineNm", lineNm);
-                    intent.putExtra("stnNm", stnNm);
-                    ArrayList<String> lines = Station.getLines(lineNm, stnNm);
-                    intent.putExtra("lines", lines);
-                    startActivity(intent);
-                    return true;
-                default:
-            }
-            return false;
+        public void onClick(View v) {
+            Intent intent = new Intent(RouteGuidanceFragment.this.getActivity(), StnInfoPagerActivity.class);
+            intent.putExtra("lineNm", lineNm);
+            intent.putExtra("stnNm", stnNm);
+            ArrayList<String> lines = Station.getLines(lineNm, stnNm);
+            intent.putExtra("lines", lines);
+            startActivity(intent);
         }
-
     }
 
     private class OnTransMapBtnClick implements View.OnClickListener {
@@ -295,60 +284,6 @@ public class RouteGuidanceFragment extends Fragment {
             intent.putExtra("endLineNm", transEndLineNm);
             intent.putExtra("endNextStnNm", transEndNextStnNm);
             startActivity(intent);
-        }
-
-    }
-
-
-    private class EvAdapter extends BaseAdapter {
-        private Context context;
-        private int resId = R.layout.item_elevator;
-        private ArrayList<Elevator> elevators;
-
-        EvAdapter(Context context, ArrayList<Elevator> elevators) {
-            this.context = context;
-            this.elevators = elevators;
-        }
-
-        @Override
-        public int getCount() {
-            return elevators.size();
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return elevators.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            Holder holder;
-            if (convertView == null) {
-                LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                convertView = inflater.inflate(resId, parent, false);
-                holder = new Holder();
-                holder.num = convertView.findViewById(R.id.num);
-                holder.floor = convertView.findViewById(R.id.floor);
-                holder.location = convertView.findViewById(R.id.location);
-                convertView.setTag(holder);
-            } else {
-                holder = (Holder) convertView.getTag();
-            }
-
-            holder.num.setText(elevators.get(position).getNum());
-            holder.floor.setText(elevators.get(position).getFloor());
-            holder.location.setText(elevators.get(position).getLocation());
-
-            return convertView;
-        }
-
-        private class Holder {
-            TextView num, floor, location;
         }
 
     }

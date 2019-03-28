@@ -7,7 +7,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -95,7 +94,7 @@ public class StnInfoFragment extends Fragment {
 
             FrameLayout mapContainer = view.findViewById(R.id.mapContainer);
             mapContainer.setClickable(true);
-            mapContainer.setOnTouchListener(new OnMapTouch());
+            mapContainer.setOnClickListener(new OnMapClick());
             mapContainer.setLongClickable(true);
 
             // 혼잡도
@@ -106,7 +105,8 @@ public class StnInfoFragment extends Fragment {
                 intent.putExtra("stnNm", stn.getStnNm());
                 intent.putExtra("bgResId", bgResId);
                 intent.putExtra("Congestion", congestion);
-                getActivity().startActivity(intent);
+                if (getActivity() != null)
+                    getActivity().startActivity(intent);
             });
 
             // 시간표
@@ -116,7 +116,8 @@ public class StnInfoFragment extends Fragment {
                 intent.putExtra("lineNm", stn.getLineNm());
                 intent.putExtra("stnNm", stn.getStnNm());
                 intent.putExtra("bgResId", bgResId);
-                getActivity().startActivity(intent);
+                if (getActivity() != null)
+                    getActivity().startActivity(intent);
             });
         }
 
@@ -126,26 +127,18 @@ public class StnInfoFragment extends Fragment {
         return mapFragment;
     }
 
-    private class OnMapTouch implements ViewGroup.OnTouchListener {
+    private class OnMapClick implements ViewGroup.OnClickListener {
 
         @Override
-        public boolean onTouch(View v, MotionEvent event) {
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    return true;
-                case MotionEvent.ACTION_UP:
-                    Intent intent = new Intent(getActivity(), ExpandedNaverMapActivity.class);
-                    intent.putExtra("lineNm", stn.getLineNm());
-                    intent.putExtra("stnNm", stn.getStnNm());
-                    intent.putExtra("latitude", stn.getWgsy());
-                    intent.putExtra("longitude", stn.getWgsx());
-                    intent.putParcelableArrayListExtra("EvInfos", elevators);
-                    intent.putExtra("bgResId", bgResId);
-                    startActivity(intent);
-                    return true;
-                default:
-            }
-            return false;
+        public void onClick(View v) {
+            Intent intent = new Intent(getActivity(), ExpandedNaverMapActivity.class);
+            intent.putExtra("lineNm", stn.getLineNm());
+            intent.putExtra("stnNm", stn.getStnNm());
+            intent.putExtra("latitude", stn.getWgsy());
+            intent.putExtra("longitude", stn.getWgsx());
+            intent.putParcelableArrayListExtra("EvInfos", elevators);
+            intent.putExtra("bgResId", bgResId);
+            startActivity(intent);
         }
     }
 
