@@ -4,7 +4,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import blacksmith.sullivanway.activity.MainActivity;
+import java.util.Locale;
 
 public class FavoriteRoute {
     private static SQLiteDatabase db;
@@ -37,7 +37,7 @@ public class FavoriteRoute {
             if (isFavorite) { //favorite 설정하려고 하는데...
                 if (type == 1) { //저장된 data가 history이면...
                     // favorite(type=0)로 UPDATE 한다
-                    sql = String.format(MainActivity.DEFAULT_LOCALE, "UPDATE %s SET type=%d WHERE _id=%d", TB_NAME, 0, cursor.getLong(0));
+                    sql = String.format(Locale.KOREAN, "UPDATE %s SET type=%d WHERE _id=%d", TB_NAME, 0, cursor.getLong(0));
                     db.execSQL(sql);
                     return true; //favorite로 설정 시 true를 반환한다
                 }
@@ -48,7 +48,7 @@ public class FavoriteRoute {
 
             // favorite 저장하려고 하는데, 저장된 data가 favorite인 경우 (favorite에서 삭제하고 history로 다시 저장하여 _id 갱신)
             // history 저장하려고 하는데, 저장된 data가 history인 경우 (history에서 삭제하고 history로 다시 저장하여 _id 갱신)
-            sql = String.format(MainActivity.DEFAULT_LOCALE, "DELETE FROM %s WHERE _id=%d", TB_NAME, cursor.getLong(0));
+            sql = String.format(Locale.KOREAN, "DELETE FROM %s WHERE _id=%d", TB_NAME, cursor.getLong(0));
             db.execSQL(sql);
         }
         cursor.close();
@@ -63,11 +63,11 @@ public class FavoriteRoute {
         db.insert(TB_NAME, null, values);
 
         // histroy는 최대 10개까지 저장한다. _id가 작은(오래된) history부터 삭제된다
-        sql = String.format(MainActivity.DEFAULT_LOCALE, "SELECT _id FROM %s WHERE type=%d", TB_NAME, 1);
+        sql = String.format(Locale.KOREAN, "SELECT _id FROM %s WHERE type=%d", TB_NAME, 1);
         cursor = db.rawQuery(sql, null);
         if (cursor.getCount() > 10 && cursor.moveToNext()) {
             // 오래된 데이터 DELETE
-            sql = String.format(MainActivity.DEFAULT_LOCALE, "DELETE FROM %s WHERE _id=%d", TB_NAME, cursor.getLong(0));
+            sql = String.format(Locale.KOREAN, "DELETE FROM %s WHERE _id=%d", TB_NAME, cursor.getLong(0));
             db.execSQL(sql);
         }
         cursor.close();

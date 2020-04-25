@@ -6,11 +6,11 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.app.NotificationCompat;
+import androidx.core.app.NotificationCompat;
 import android.widget.Toast;
 
 import blacksmith.sullivanway.R;
-import blacksmith.sullivanway.activity.RouteGuidancePagerActivity;
+import blacksmith.sullivanway.tempactivity.RouteGuidancePagerActivity;
 import blacksmith.sullivanway.dialog.AlarmDialogActivity;
 
 public class AlarmReceiver extends BroadcastReceiver {

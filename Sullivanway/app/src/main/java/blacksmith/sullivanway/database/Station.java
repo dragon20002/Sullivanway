@@ -7,7 +7,7 @@ import android.os.Parcelable;
 
 import java.util.ArrayList;
 
-import blacksmith.sullivanway.activity.MainActivity;
+import blacksmith.sullivanway.tempactivity.MainActivity;
 
 // 역정보 클래스
 public class Station implements Parcelable {

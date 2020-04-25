@@ -1,59 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
-
-    <TextView
-        android:id="@+id/stnNm"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="@dimen/stn_info_title_padding"
-        android:gravity="center"
-        android:textSize="22sp"
-        android:textColor="@android:color/white"
-        android:background="@color/colorPrimary"/>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <LinearLayout
-        android:id="@+id/nextStnLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/timetable_margin"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="@dimen/timetable_margin">
-
-        <TextView
-            android:id="@+id/upwardStnNm"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:textSize="@dimen/timetable_text_mid_size"
-            android:drawableStart="@drawable/ic_chevron_left_black_24dp"/>
-
-        <TextView
-            android:id="@+id/downwardStnNm"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:textSize="@dimen/timetable_text_mid_size"
-            android:drawableEnd="@drawable/ic_chevron_right_black_24dp"/>
-    </LinearLayout>
-
-    <android.support.design.widget.TabLayout
-        android:id="@+id/tabLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/timetable_margin"
-        android:paddingBottom="10dp" />
-
-    <android.support.v4.view.ViewPager
-        android:id="@+id/viewPager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="@dimen/timetable_margin"
-        android:padding="10dp" />
+        android:orientation="vertical">
 
-</LinearLayout>
+        <TextView
+            android:id="@+id/stnNm"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:gravity="center"
+            android:padding="@dimen/stn_info_title_padding"
+            android:textColor="@android:color/white"
+            android:textSize="22sp" />
+
+        <LinearLayout
+            android:id="@+id/nextStnLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="@dimen/timetable_margin"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="@dimen/timetable_margin">
+
+            <TextView
+                android:id="@+id/upwardStnNm"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:drawableStart="@drawable/ic_chevron_left_black_24dp"
+                android:gravity="center"
+                android:textSize="@dimen/timetable_text_mid_size" />
+
+            <TextView
+                android:id="@+id/downwardStnNm"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:drawableEnd="@drawable/ic_chevron_right_black_24dp"
+                android:gravity="center"
+                android:textSize="@dimen/timetable_text_mid_size" />
+        </LinearLayout>
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/timetable_margin"
+            android:paddingBottom="10dp" />
+
+        <androidx.viewpager.widget.ViewPager
+            android:id="@+id/viewPager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="@dimen/timetable_margin"
+            android:padding="10dp" />
+
+    </LinearLayout>
+</layout>

@@ -1,7 +1,6 @@
 # Sullivanway
 일반적인 지하철앱을 구현하고, 가까운 엘리베이터 위치 정보, 휠체어 탑승자를 위한 환승지도 등 장애인을 위한 기능을 개발
 
-
 ## 사용 기술
 - Android
 > Firebase Cloud Messaging<br>
@@ -15,3 +14,6 @@
 ![역 정보](https://postfiles.pstatic.net/MjAxOTAyMThfOTMg/MDAxNTUwNDcyMDI4ODc2.Nml0sNSy6U8TMFkWEhqdS5iLdNHZoJ4NUNosQ34soSkg.ngRwCs-j22jJTxQsYu1uhCwJER15uPCHGcX95uyFlOIg.PNG.dragon20002/%EA%B7%B8%EB%A6%BC11.png?type=w580)
 <br>
 ※ 환승지도 by [무의](https://www.wearemuui.com/kr/specialproject/)
+
+## 레퍼런스
+Mindorks's MVVM Architecture Sample App

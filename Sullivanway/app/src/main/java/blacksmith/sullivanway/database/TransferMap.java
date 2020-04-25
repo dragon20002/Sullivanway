@@ -2,7 +2,8 @@ package blacksmith.sullivanway.database;
 
 import android.database.sqlite.SQLiteDatabase;
 
-import blacksmith.sullivanway.activity.MainActivity;
+import java.util.Locale;
+
 import blacksmith.sullivanway.R;
 
 public class TransferMap {
@@ -25,7 +26,7 @@ public class TransferMap {
     private static void insert(int res, String stnNm, String startLine, String startNextStnNm, String endLineNm, String endNextStnNm, String floor, int time) {
         //DB에 입력한 값으로 행 추가
         String sql=String.format(
-                MainActivity.DEFAULT_LOCALE,
+                Locale.KOREAN,
                 "INSERT INTO %s VALUES(%d,'%s','%s'," +
                         "'%s','%s','%s','%s',%d);",
                 TB_NAME, res, stnNm, startLine, startNextStnNm,

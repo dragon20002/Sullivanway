@@ -3,6 +3,7 @@ package blacksmith.sullivanway.routeguidance;
 import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -110,6 +111,7 @@ public class RouteWrapper implements Parcelable {
                 int walkTime = times.get(j + 1) - times.get(j);
                 String transStartNextStnNm = Station.getNextStnNm(targetStn.getLineNm(), targetStn.getStnNm(), Station.getToward(stnIdx.get(path.get(j - 1)), targetStn));
                 String transEndNextStnNm = Station.getNextStnNm(nextTargetStn.getLineNm(), nextTargetStn.getStnNm(), Station.getToward(nextTargetStn, stnIdx.get(path.get(j + 2))));
+
                 RouteWrapper walkLineItem = new RouteWrapper(targetStn.getStnNm(), targetStn.getLineNm(), transStartNextStnNm, nextTargetStn.getLineNm(), transEndNextStnNm, walkTime);
                 items.add(walkLineItem);
                 j++;//i=j, 다음 루프에서 j는 i 다음역을 의미한다

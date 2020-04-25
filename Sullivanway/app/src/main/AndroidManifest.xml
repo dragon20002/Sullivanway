@@ -24,8 +24,7 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
-        <activity
-            android:name=".activity.MainActivity"
+        <activity android:name=".ui.stationdetail.StationDetailActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -35,42 +34,48 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
-            android:name=".activity.StnInfoPagerActivity"
-            android:parentActivityName=".activity.MainActivity"
+            android:name=".tempactivity.MainActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity
+            android:name=".tempactivity.StnInfoPagerActivity"
+            android:parentActivityName=".tempactivity.MainActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.ExpandedNaverMapActivity"
-            android:parentActivityName=".activity.StnInfoPagerActivity"
+            android:name=".tempactivity.ExpandedNaverMapActivity"
+            android:parentActivityName=".tempactivity.StnInfoPagerActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.RouteGuidancePagerActivity"
-            android:parentActivityName=".activity.MainActivity"
+            android:name=".tempactivity.RouteGuidancePagerActivity"
+            android:parentActivityName=".tempactivity.MainActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.TransferMapListActivity"
-            android:parentActivityName=".activity.MainActivity"
+            android:name=".tempactivity.TransferMapListActivity"
+            android:parentActivityName=".tempactivity.MainActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.TransferMapPagerActivity"
+            android:name=".tempactivity.TransferMapPagerActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.FavoriteRouteActivity"
-            android:parentActivityName=".activity.MainActivity"
+            android:name=".tempactivity.FavoriteRouteActivity"
+            android:parentActivityName=".tempactivity.MainActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.CongestionGraphActivity"
-            android:parentActivityName=".activity.RouteGuidancePagerActivity"
+            android:name=".tempactivity.CongestionGraphActivity"
+            android:parentActivityName=".tempactivity.RouteGuidancePagerActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.ActionBar" />
         <activity
-            android:name=".activity.TimeTablePagerActivity"
-            android:parentActivityName=".activity.StnInfoPagerActivity"
+            android:name=".tempactivity.TimeTablePagerActivity"
+            android:parentActivityName=".tempactivity.StnInfoPagerActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.SettingsActivity"
+            android:name=".tempactivity.SettingsActivity"
             android:label="@string/trans_stn_setting_title"
-            android:parentActivityName=".activity.MainActivity"
+            android:parentActivityName=".tempactivity.MainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.ActionBar" />
 
@@ -83,7 +88,6 @@
 
         <receiver android:name=".service.AlarmReceiver" />
 
-        <!-- activity dialog -->
         <activity
             android:name=".dialog.AlarmDialogActivity"
             android:theme="@android:style/Theme.Translucent" />
