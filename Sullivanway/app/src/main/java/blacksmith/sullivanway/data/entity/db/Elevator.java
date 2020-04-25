@@ -1,5 +1,6 @@
 package blacksmith.sullivanway.data.entity.db;
 
+import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
@@ -7,6 +8,7 @@ import androidx.room.ForeignKey;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+@SuppressWarnings("NullableProblems")
 @Entity(
     primaryKeys = {
         "stn_id",
@@ -23,11 +25,13 @@ import com.google.gson.annotations.SerializedName;
 )
 public class Elevator {
 
+    @NonNull
     @Expose
     @SerializedName("stn_id")
     @ColumnInfo(name = "stn_id")
     public Long stnId; //역 ID
 
+    @NonNull
     @Expose
     @SerializedName("seq_num")
     @ColumnInfo(name = "seq_num")

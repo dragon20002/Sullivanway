@@ -17,13 +17,11 @@
 package blacksmith.sullivanway.utils;
 
 import androidx.databinding.BindingAdapter;
-
-import com.mindorks.placeholderview.SwipePlaceHolderView;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
 import blacksmith.sullivanway.data.entity.others.StationData;
-import blacksmith.sullivanway.ui.stationdetail.StationCard;
 import blacksmith.sullivanway.ui.stationdetail.StationDetailViewModel;
 
 /**
@@ -37,17 +35,18 @@ public final class BindingUtils {
     }
 
     @BindingAdapter({"adapter", "action"})
-    public static void addStationItems(SwipePlaceHolderView cardsContainerView, List<StationData> stationList, int action) {
+    public static void addStationItems(RecyclerView recyclerView, List<StationData> stationList, int action) {
         if (action == StationDetailViewModel.ACTION_ADD_ALL) {
-            if (stationList != null) {
-                cardsContainerView.removeAllViews();
-                for (StationData station : stationList) {
-                    if (station != null) {
-                        cardsContainerView.addView(new StationCard(station));
-                    }
-                }
-                ViewAnimationUtils.scaleAnimateView(cardsContainerView);
-            }
+//            recyclerView.getAdapter();
+//            if (stationList != null) {
+//                recyclerView.removeAllViews();
+//                for (StationData station : stationList) {
+//                    if (station != null) {
+//                        recyclerView.addView(new StationCard(station));
+//                    }
+//                }
+//                ViewAnimationUtils.scaleAnimateView(recyclerView);
+//            }
         }
     }
 

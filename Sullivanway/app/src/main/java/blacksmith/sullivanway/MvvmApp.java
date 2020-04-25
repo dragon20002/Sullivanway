@@ -16,7 +16,6 @@
 
 package blacksmith.sullivanway;
 
-import android.app.Activity;
 import android.app.Application;
 
 import com.androidnetworking.AndroidNetworking;
@@ -28,19 +27,19 @@ import blacksmith.sullivanway.di.component.DaggerAppComponent;
 import blacksmith.sullivanway.utils.AppLogger;
 import dagger.android.AndroidInjector;
 import dagger.android.DispatchingAndroidInjector;
-import dagger.android.HasActivityInjector;
+import dagger.android.HasAndroidInjector;
 
 /**
  * Created by amitshekhar on 07/07/17.
  */
 
-public class MvvmApp extends Application implements HasActivityInjector {
+public class MvvmApp extends Application implements HasAndroidInjector {
 
     @Inject
-    DispatchingAndroidInjector<Activity> activityDispatchingAndroidInjector;
+    DispatchingAndroidInjector<Object> activityDispatchingAndroidInjector;
 
     @Override
-    public AndroidInjector<Activity> activityInjector() {
+    public AndroidInjector<Object> androidInjector() {
         return activityDispatchingAndroidInjector;
     }
 

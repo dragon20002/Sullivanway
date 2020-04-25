@@ -1,5 +1,6 @@
 package blacksmith.sullivanway.data.entity.db;
 
+import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
@@ -7,11 +8,12 @@ import androidx.room.ForeignKey;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+@SuppressWarnings("NullableProblems")
 @Entity(
     tableName = "search_history",
     primaryKeys = {
-        "start_stn_id",
-        "end_stn_id"
+        "start_node_id",
+        "end_node_id"
     },
     foreignKeys = {
         @ForeignKey(
@@ -31,14 +33,16 @@ import com.google.gson.annotations.SerializedName;
 
 public class SearchHistory {
 
+    @NonNull
     @Expose
     @SerializedName("start_node_id")
-    @ColumnInfo(name = "start_node_id")
+    @ColumnInfo(name = "start_node_id", index = true)
     public Long startNodeId; //출발역 노드 ID
 
+    @NonNull
     @Expose
     @SerializedName("end_node_id")
-    @ColumnInfo(name = "end_node_id")
+    @ColumnInfo(name = "end_node_id", index = true)
     public Long endNodeId; //도착역 노드 ID
 
     @Expose

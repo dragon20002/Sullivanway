@@ -1,0 +1,692 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 2,
+    "identityHash": "3fecbfec25972c94885cf791730bfe04",
+    "entities": [
+      {
+        "tableName": "subway_node",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `x` INTEGER, `y` INTEGER)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "x",
+            "columnName": "x",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "y",
+            "columnName": "y",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "subway_line",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `name` TEXT, `symbol_res_id` INTEGER, `color_res_id` INTEGER, `icon_res_id` INTEGER, `bg_res_id` INTEGER)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "symbolResId",
+            "columnName": "symbol_res_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "colorResId",
+            "columnName": "color_res_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "iconResId",
+            "columnName": "icon_res_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "bgResId",
+            "columnName": "bg_res_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "station",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `line_id` INTEGER, `node_id` INTEGER, `name` TEXT, FOREIGN KEY(`node_id`) REFERENCES `subway_node`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`line_id`) REFERENCES `subway_line`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "lineId",
+            "columnName": "line_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "nodeId",
+            "columnName": "node_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_station_line_id",
+            "unique": false,
+            "columnNames": [
+              "line_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_station_line_id` ON `${TABLE_NAME}` (`line_id`)"
+          },
+          {
+            "name": "index_station_node_id",
+            "unique": false,
+            "columnNames": [
+              "node_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_station_node_id` ON `${TABLE_NAME}` (`node_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "subway_node",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "node_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "subway_line",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "line_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "station_detail",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`stn_id` INTEGER, `distance` REAL, `wgs_x` REAL, `wgs_y` REAL, `door` INTEGER, `contact` TEXT, `toilet` INTEGER, `elevator` INTEGER, `escalator` INTEGER, `wheel_lift` INTEGER, PRIMARY KEY(`stn_id`), FOREIGN KEY(`stn_id`) REFERENCES `station`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "stnId",
+            "columnName": "stn_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "distance",
+            "columnName": "distance",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "wgsX",
+            "columnName": "wgs_x",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "wgsY",
+            "columnName": "wgs_y",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "door",
+            "columnName": "door",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "contact",
+            "columnName": "contact",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "toilet",
+            "columnName": "toilet",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "elevator",
+            "columnName": "elevator",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "escalator",
+            "columnName": "escalator",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "wheelLift",
+            "columnName": "wheel_lift",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "stn_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": [
+          {
+            "table": "station",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "stn_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "Elevator",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`stn_id` INTEGER NOT NULL, `seq_num` INTEGER NOT NULL, `in_out_type` INTEGER, `top_floor` INTEGER, `top_floor_type` INTEGER, `bottom_floor` INTEGER, `bottom_floor_type` INTEGER, `location` TEXT, PRIMARY KEY(`stn_id`, `seq_num`), FOREIGN KEY(`stn_id`) REFERENCES `station`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "stnId",
+            "columnName": "stn_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "seqNum",
+            "columnName": "seq_num",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "inOutType",
+            "columnName": "in_out_type",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "topFloor",
+            "columnName": "top_floor",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "topFloorType",
+            "columnName": "top_floor_type",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "bottomFloor",
+            "columnName": "bottom_floor",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "bottomFloorType",
+            "columnName": "bottom_floor_type",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "location",
+            "columnName": "location",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "stn_id",
+            "seq_num"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": [
+          {
+            "table": "station",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "stn_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "congestion",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`stn_id` INTEGER NOT NULL, `date` TEXT NOT NULL, `time` INTEGER NOT NULL, `count` INTEGER, PRIMARY KEY(`stn_id`, `date`, `time`), FOREIGN KEY(`stn_id`) REFERENCES `station`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "stnId",
+            "columnName": "stn_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "date",
+            "columnName": "date",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "time",
+            "columnName": "time",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "count",
+            "columnName": "count",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "stn_id",
+            "date",
+            "time"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": [
+          {
+            "table": "station",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "stn_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "time_table",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`line_id` INTEGER NOT NULL, `start_stn_id` INTEGER NOT NULL, `end_stn_id` INTEGER NOT NULL, `up_down_type` INTEGER NOT NULL, `week_type` INTEGER NOT NULL, `seq_num` INTEGER NOT NULL, `subway_type` INTEGER, `time` TEXT, PRIMARY KEY(`line_id`, `start_stn_id`, `end_stn_id`, `up_down_type`, `week_type`, `seq_num`), FOREIGN KEY(`line_id`) REFERENCES `subway_line`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`start_stn_id`) REFERENCES `station`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`end_stn_id`) REFERENCES `station`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "lineId",
+            "columnName": "line_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "startStnId",
+            "columnName": "start_stn_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "endStnId",
+            "columnName": "end_stn_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "upDownType",
+            "columnName": "up_down_type",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "weekType",
+            "columnName": "week_type",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "seqNum",
+            "columnName": "seq_num",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "subwayType",
+            "columnName": "subway_type",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "time",
+            "columnName": "time",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "line_id",
+            "start_stn_id",
+            "end_stn_id",
+            "up_down_type",
+            "week_type",
+            "seq_num"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_time_table_line_id",
+            "unique": false,
+            "columnNames": [
+              "line_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_time_table_line_id` ON `${TABLE_NAME}` (`line_id`)"
+          },
+          {
+            "name": "index_time_table_start_stn_id",
+            "unique": false,
+            "columnNames": [
+              "start_stn_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_time_table_start_stn_id` ON `${TABLE_NAME}` (`start_stn_id`)"
+          },
+          {
+            "name": "index_time_table_end_stn_id",
+            "unique": false,
+            "columnNames": [
+              "end_stn_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_time_table_end_stn_id` ON `${TABLE_NAME}` (`end_stn_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "subway_line",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "line_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "station",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "start_stn_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "station",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "end_stn_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "transfer_map",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`start_stn_id` INTEGER NOT NULL, `end_stn_id` INTEGER NOT NULL, `start_up_down_type` INTEGER NOT NULL, `end_up_down_type` INTEGER NOT NULL, `floor` INTEGER NOT NULL, `res_id` INTEGER, `time` INTEGER, PRIMARY KEY(`start_stn_id`, `end_stn_id`, `start_up_down_type`, `end_up_down_type`, `floor`), FOREIGN KEY(`start_stn_id`) REFERENCES `station`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`end_stn_id`) REFERENCES `station`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "startStnId",
+            "columnName": "start_stn_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "endStnId",
+            "columnName": "end_stn_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "startUpDownType",
+            "columnName": "start_up_down_type",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "endUpDownType",
+            "columnName": "end_up_down_type",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "floor",
+            "columnName": "floor",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "resId",
+            "columnName": "res_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "time",
+            "columnName": "time",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "start_stn_id",
+            "end_stn_id",
+            "start_up_down_type",
+            "end_up_down_type",
+            "floor"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_transfer_map_start_stn_id",
+            "unique": false,
+            "columnNames": [
+              "start_stn_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_transfer_map_start_stn_id` ON `${TABLE_NAME}` (`start_stn_id`)"
+          },
+          {
+            "name": "index_transfer_map_end_stn_id",
+            "unique": false,
+            "columnNames": [
+              "end_stn_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_transfer_map_end_stn_id` ON `${TABLE_NAME}` (`end_stn_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "station",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "start_stn_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "station",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "end_stn_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "search_history",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`start_node_id` INTEGER NOT NULL, `end_node_id` INTEGER NOT NULL, `type` INTEGER, `req_timestamp` INTEGER, PRIMARY KEY(`start_node_id`, `end_node_id`), FOREIGN KEY(`start_node_id`) REFERENCES `subway_node`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`end_node_id`) REFERENCES `subway_node`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "startNodeId",
+            "columnName": "start_node_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "endNodeId",
+            "columnName": "end_node_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "regTimestamp",
+            "columnName": "req_timestamp",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "start_node_id",
+            "end_node_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_search_history_start_node_id",
+            "unique": false,
+            "columnNames": [
+              "start_node_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_search_history_start_node_id` ON `${TABLE_NAME}` (`start_node_id`)"
+          },
+          {
+            "name": "index_search_history_end_node_id",
+            "unique": false,
+            "columnNames": [
+              "end_node_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_search_history_end_node_id` ON `${TABLE_NAME}` (`end_node_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "subway_node",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "start_node_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "subway_node",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "end_node_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '3fecbfec25972c94885cf791730bfe04')"
+    ]
+  }
+}

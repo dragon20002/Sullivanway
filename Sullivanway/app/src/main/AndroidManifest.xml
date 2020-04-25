@@ -10,6 +10,7 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
 
     <application
+        android:name=".MvvmApp"
         android:allowBackup="false"
         android:hardwareAccelerated="false"
         android:icon="@mipmap/sullivanway_launcher"

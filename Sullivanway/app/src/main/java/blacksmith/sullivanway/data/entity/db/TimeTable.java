@@ -1,5 +1,6 @@
 package blacksmith.sullivanway.data.entity.db;
 
+import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
@@ -7,6 +8,7 @@ import androidx.room.ForeignKey;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+@SuppressWarnings("NullableProblems")
 @Entity(
     tableName = "time_table",
     primaryKeys = {
@@ -41,31 +43,37 @@ import com.google.gson.annotations.SerializedName;
 
 public class TimeTable {
 
+    @NonNull
     @Expose
     @SerializedName("line_id")
-    @ColumnInfo(name = "line_id")
+    @ColumnInfo(name = "line_id", index = true)
     public Long lineId; //호선 ID
 
+    @NonNull
     @Expose
     @SerializedName("start_stn_id")
-    @ColumnInfo(name = "start_stn_id")
+    @ColumnInfo(name = "start_stn_id", index = true)
     public Long startStnId; //운행 시작역 ID
 
+    @NonNull
     @Expose
     @SerializedName("end_stn_id")
-    @ColumnInfo(name = "end_stn_id")
+    @ColumnInfo(name = "end_stn_id", index = true)
     public Long endStnId; //운행 종착역 ID
 
+    @NonNull
     @Expose
     @SerializedName("up_down_type")
     @ColumnInfo(name = "up_down_type")
     public Integer upDownType; //상하행 (1: 상/내, 2: 하/외)
 
+    @NonNull
     @Expose
     @SerializedName("week_type")
     @ColumnInfo(name = "week_type")
     public Integer weekType; //주중주말 (1: 평일, 2: 토, 3: 일/공)
 
+    @NonNull
     @Expose
     @SerializedName("seq_num")
     @ColumnInfo(name = "seq_num")

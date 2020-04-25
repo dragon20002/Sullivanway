@@ -6,10 +6,7 @@ import androidx.room.PrimaryKey;
 import com.google.gson.annotations.Expose;
 
 @Entity(
-    tableName = "subway_node",
-    primaryKeys = {
-        "id"
-    }
+    tableName = "subway_node"
 )
 
 public class SubwayNode {

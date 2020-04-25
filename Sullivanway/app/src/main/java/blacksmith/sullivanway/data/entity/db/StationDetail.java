@@ -10,9 +10,6 @@ import com.google.gson.annotations.SerializedName;
 
 @Entity(
     tableName = "station_detail",
-    primaryKeys = {
-        "stn_id"
-    },
     foreignKeys = {
         @ForeignKey(
             entity = Station.class,

@@ -10,9 +10,6 @@ import com.google.gson.annotations.SerializedName;
 
 @Entity(
     tableName = "station",
-    primaryKeys = {
-        "id"
-    },
     foreignKeys = {
         @ForeignKey(entity = SubwayNode.class,
             parentColumns = "id",
@@ -33,12 +30,12 @@ public class Station {
 
     @Expose
     @SerializedName("line_id")
-    @ColumnInfo(name = "line_id")
+    @ColumnInfo(name = "line_id", index = true)
     public Long lineId; //호선 ID
 
     @Expose
     @SerializedName("node_id")
-    @ColumnInfo(name = "node_id")
+    @ColumnInfo(name = "node_id", index = true)
     public Long nodeId; //역 노드 ID
 
     @Expose
