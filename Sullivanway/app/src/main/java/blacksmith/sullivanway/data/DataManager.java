@@ -18,8 +18,10 @@ package blacksmith.sullivanway.data;
 
 import java.util.List;
 
+import blacksmith.sullivanway.data.entity.db.Station;
 import blacksmith.sullivanway.data.entity.db.SubwayNode;
-import blacksmith.sullivanway.data.entity.others.StationData;
+import blacksmith.sullivanway.data.entity.others.StationDetailVo;
+import blacksmith.sullivanway.data.entity.others.StationVo;
 import blacksmith.sullivanway.data.local.db.DbHelper;
 import blacksmith.sullivanway.data.local.prefs.PreferencesHelper;
 import blacksmith.sullivanway.data.remote.ApiHelper;
@@ -31,5 +33,7 @@ import io.reactivex.Observable;
 
 public interface DataManager extends DbHelper, PreferencesHelper, ApiHelper {
 
-    Observable<List<StationData>> getStationData(SubwayNode subwayNode);
+    Observable<List<StationVo>> getStationVos(SubwayNode subwayNode);
+
+    Observable<StationDetailVo> getStationDetailVo(Station station);
 }

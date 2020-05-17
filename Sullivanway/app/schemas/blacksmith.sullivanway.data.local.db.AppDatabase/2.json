@@ -2,16 +2,22 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "3fecbfec25972c94885cf791730bfe04",
+    "identityHash": "2f13bda32f7d985627a8b48727b7358f",
     "entities": [
       {
         "tableName": "subway_node",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `x` INTEGER, `y` INTEGER)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `name` TEXT, `x` INTEGER, `y` INTEGER)",
         "fields": [
           {
             "fieldPath": "id",
             "columnName": "id",
             "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
             "notNull": false
           },
           {
@@ -88,7 +94,7 @@
       },
       {
         "tableName": "station",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `line_id` INTEGER, `node_id` INTEGER, `name` TEXT, FOREIGN KEY(`node_id`) REFERENCES `subway_node`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`line_id`) REFERENCES `subway_line`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `line_id` INTEGER, `node_id` INTEGER, FOREIGN KEY(`node_id`) REFERENCES `subway_node`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`line_id`) REFERENCES `subway_line`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
         "fields": [
           {
             "fieldPath": "id",
@@ -106,12 +112,6 @@
             "fieldPath": "nodeId",
             "columnName": "node_id",
             "affinity": "INTEGER",
-            "notNull": false
-          },
-          {
-            "fieldPath": "name",
-            "columnName": "name",
-            "affinity": "TEXT",
             "notNull": false
           }
         ],
@@ -686,7 +686,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '3fecbfec25972c94885cf791730bfe04')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2f13bda32f7d985627a8b48727b7358f')"
     ]
   }
 }

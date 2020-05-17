@@ -46,6 +46,24 @@ public class AppDbHelper implements DbHelper {
     }
 
     @Override
+    public Observable<List<SubwayNode>> getSubwayNodes() {
+        return mAppDatabase.subwayNodeDao().loadAll()
+                .toObservable();
+    }
+
+    @Override
+    public Observable<SubwayNode> getSubwayNode(SubwayNode subwayNode) {
+        return mAppDatabase.subwayNodeDao().loadOneById(subwayNode.id)
+                .toObservable();
+    }
+
+    @Override
+    public Observable<Station> getStation(Station station) {
+        return mAppDatabase.stationDao().loadOneById(station.id)
+                .toObservable();
+    }
+
+    @Override
     public Observable<List<Station>> getStations(SubwayNode subwayNode) {
         return mAppDatabase.stationDao().loadAllByNodeId(subwayNode.id)
                 .toObservable();

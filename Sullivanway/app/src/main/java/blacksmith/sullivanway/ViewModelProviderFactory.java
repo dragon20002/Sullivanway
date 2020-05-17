@@ -7,7 +7,9 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import blacksmith.sullivanway.data.DataManager;
-import blacksmith.sullivanway.ui.stationdetail.StationDetailViewModel;
+import blacksmith.sullivanway.ui.main.MainViewModel;
+import blacksmith.sullivanway.ui.subwaynode.SubwayNodeViewModel;
+import blacksmith.sullivanway.ui.subwaynode.stationdetail.StationDetailViewModel;
 import blacksmith.sullivanway.utils.rx.SchedulerProvider;
 
 /**
@@ -28,6 +30,14 @@ public class ViewModelProviderFactory extends ViewModelProvider.NewInstanceFacto
 
     @Override
     public <T extends ViewModel> T create(Class<T> modelClass) {
+        if (modelClass.isAssignableFrom(MainViewModel.class)) {
+            //noinspection unchecked
+            return (T) new MainViewModel(dataManager, schedulerProvider);
+        }
+        if (modelClass.isAssignableFrom(SubwayNodeViewModel.class)) {
+            //noinspection unchecked
+            return (T) new SubwayNodeViewModel(dataManager, schedulerProvider);
+        }
         if (modelClass.isAssignableFrom(StationDetailViewModel.class)) {
             //noinspection unchecked
             return (T) new StationDetailViewModel(dataManager, schedulerProvider);

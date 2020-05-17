@@ -1,5 +1,6 @@
-package blacksmith.sullivanway.ui.stationdetail;
+package blacksmith.sullivanway.ui.subwaynode.stationdetail;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -10,6 +11,7 @@ import javax.inject.Inject;
 import blacksmith.sullivanway.BR;
 import blacksmith.sullivanway.R;
 import blacksmith.sullivanway.ViewModelProviderFactory;
+import blacksmith.sullivanway.data.entity.db.Station;
 import blacksmith.sullivanway.databinding.FragmentStationDetailBinding;
 import blacksmith.sullivanway.ui.base.BaseFragment;
 
@@ -45,6 +47,31 @@ public class StationDetailFragment extends BaseFragment<FragmentStationDetailBin
     }
 
     @Override
+    public void openMapActivity() {
+
+    }
+
+    @Override
+    public void openTimeTableActivity() {
+
+    }
+
+    @Override
+    public void openCongestionActivity() {
+
+    }
+
+    @Override
+    public void swipeLeft() {
+
+    }
+
+    @Override
+    public void swipeRight() {
+
+    }
+
+    @Override
     public void handleError(Throwable throwable) {
         // handle error
     }
@@ -58,5 +85,25 @@ public class StationDetailFragment extends BaseFragment<FragmentStationDetailBin
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mStationDetailViewModel.setNavigator(this);
+
+        Bundle args = getArguments();
+        if (args != null) {
+            long stationId = args.getLong("stationId", -1L);
+            if (stationId != -1) {
+                Station station = new Station();
+                {
+                    station.id = stationId;
+                }
+
+                mStationDetailViewModel.loadStation(station);
+            } else {
+                // TODO Alert No SubwayNode Selected!
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
+                alertDialogBuilder.setTitle("알림")
+                        .setMessage("역 정보를 찾을 수 없습니다.")
+                        .create();
+                alertDialogBuilder.show();
+            }
+        }
     }
 }

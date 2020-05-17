@@ -16,6 +16,9 @@ public class SubwayNode {
     public Long id;
 
     @Expose
+    public String name; //역 이름
+
+    @Expose
     public Integer x; //가로 터치 위치
 
     @Expose

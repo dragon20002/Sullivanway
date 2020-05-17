@@ -21,8 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-import blacksmith.sullivanway.data.entity.others.StationData;
-import blacksmith.sullivanway.ui.stationdetail.StationDetailViewModel;
+import blacksmith.sullivanway.data.entity.others.StationDetailVo;
 
 /**
  * Created by amitshekhar on 11/07/17.
@@ -35,8 +34,8 @@ public final class BindingUtils {
     }
 
     @BindingAdapter({"adapter", "action"})
-    public static void addStationItems(RecyclerView recyclerView, List<StationData> stationList, int action) {
-        if (action == StationDetailViewModel.ACTION_ADD_ALL) {
+    public static void addStationItems(RecyclerView recyclerView, List<StationDetailVo> stationList, int action) {
+//        if (action == SubwayNodeViewModel.ACTION_ADD_ALL) {
 //            recyclerView.getAdapter();
 //            if (stationList != null) {
 //                recyclerView.removeAllViews();
@@ -47,7 +46,7 @@ public final class BindingUtils {
 //                }
 //                ViewAnimationUtils.scaleAnimateView(recyclerView);
 //            }
-        }
+//        }
     }
 
 }

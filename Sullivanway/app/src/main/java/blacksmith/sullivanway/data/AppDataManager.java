@@ -33,7 +33,8 @@ import blacksmith.sullivanway.data.entity.db.SubwayLine;
 import blacksmith.sullivanway.data.entity.db.SubwayNode;
 import blacksmith.sullivanway.data.entity.db.TimeTable;
 import blacksmith.sullivanway.data.entity.db.TransferMap;
-import blacksmith.sullivanway.data.entity.others.StationData;
+import blacksmith.sullivanway.data.entity.others.StationDetailVo;
+import blacksmith.sullivanway.data.entity.others.StationVo;
 import blacksmith.sullivanway.data.local.db.DbHelper;
 import blacksmith.sullivanway.data.local.prefs.PreferencesHelper;
 import blacksmith.sullivanway.data.remote.ApiHelper;
@@ -71,26 +72,47 @@ public class AppDataManager implements DataManager {
      */
 
     @Override
-    public Observable<List<StationData>> getStationData(SubwayNode subwayNode) {
+    public Observable<SubwayNode> getSubwayNode(SubwayNode subwayNode) {
+        return mDbHelper.getSubwayNode(subwayNode);
+    }
+
+    @Override
+    public Observable<List<StationVo>> getStationVos(SubwayNode subwayNode) {
         return mDbHelper.getStations(subwayNode)
                 .flatMap(Observable::fromIterable)
                 .flatMap(station -> Observable.zip(
-                    mDbHelper.getSubwayLine(station),
-                    mDbHelper.getStationDetail(station),
-                    mDbHelper.getElevators(station),
-                    mDbHelper.getCongestions(station),
-                    mDbHelper.getTimeTables(station),
-                    mDbHelper.getTransferMaps(station),
-                    (subwayLine, stationDetail, elevators, congestions, timeTables, transferMaps) ->
-                            new StationData(subwayLine, station, stationDetail, elevators, congestions, timeTables, transferMaps)
-                ))
+                        Observable.just(station),
+                        mDbHelper.getSubwayLine(station),
+                        StationVo::new))
                 .toList()
                 .toObservable();
+    }
+
+    @Override
+    public Observable<StationDetailVo> getStationDetailVo(Station station) {
+        return mDbHelper.getStation(station)
+                .map(_station -> Observable.zip(
+                    mDbHelper.getStationDetail(_station),
+                    mDbHelper.getElevators(_station),
+                    (stationDetail, elevators) ->
+                            new StationDetailVo(_station, stationDetail, elevators)
+                ))
+                .blockingFirst();
     }
 
     /***
      * Override from DbHelper
      */
+
+    @Override
+    public Observable<List<SubwayNode>> getSubwayNodes() {
+        return mDbHelper.getSubwayNodes();
+    }
+
+    @Override
+    public Observable<Station> getStation(Station station) {
+        return mDbHelper.getStation(station);
+    }
 
     @Override
     public Observable<List<Station>> getStations(SubwayNode subwayNode) {

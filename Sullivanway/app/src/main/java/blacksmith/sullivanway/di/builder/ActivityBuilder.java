@@ -16,7 +16,8 @@
 
 package blacksmith.sullivanway.di.builder;
 
-import blacksmith.sullivanway.ui.stationdetail.StationDetailActivity;
+import blacksmith.sullivanway.ui.main.MainActivity;
+import blacksmith.sullivanway.ui.subwaynode.SubwayNodeActivity;
 import dagger.Module;
 import dagger.android.ContributesAndroidInjector;
 
@@ -27,5 +28,8 @@ import dagger.android.ContributesAndroidInjector;
 public abstract class ActivityBuilder {
 
     @ContributesAndroidInjector
-    abstract StationDetailActivity bindStationDetailActivity();
+    abstract MainActivity bindMainActivity();
+
+    @ContributesAndroidInjector
+    abstract SubwayNodeActivity bindSubwayNodeActivity();
 }

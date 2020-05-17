@@ -1,4 +1,4 @@
-package blacksmith.sullivanway.ui.stationdetail;
+package blacksmith.sullivanway.ui.subwaynode.stationdetail;
 
 import dagger.Module;
 import dagger.android.ContributesAndroidInjector;

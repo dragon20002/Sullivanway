@@ -11,6 +11,9 @@ import io.reactivex.Single;
 @Dao
 public interface StationDao {
 
+    @Query("SELECT * FROM station WHERE id = :id")
+    Single<Station> loadOneById(Long id);
+
     @Query("SELECT * FROM station WHERE node_id = :nodeId")
     Single<List<Station>> loadAllByNodeId(Long nodeId);
 }

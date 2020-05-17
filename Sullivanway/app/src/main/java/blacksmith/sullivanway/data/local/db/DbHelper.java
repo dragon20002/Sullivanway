@@ -26,6 +26,7 @@ import blacksmith.sullivanway.data.entity.db.SubwayLine;
 import blacksmith.sullivanway.data.entity.db.SubwayNode;
 import blacksmith.sullivanway.data.entity.db.TimeTable;
 import blacksmith.sullivanway.data.entity.db.TransferMap;
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 
 /**
@@ -33,6 +34,12 @@ import io.reactivex.Observable;
  */
 
 public interface DbHelper {
+
+    Observable<List<SubwayNode>> getSubwayNodes();
+
+    Observable<SubwayNode> getSubwayNode(SubwayNode subwayNode);
+
+    Observable<Station> getStation(Station station);
 
     Observable<List<Station>> getStations(SubwayNode subwayNode); //환승역 목록 반환
 
@@ -47,4 +54,5 @@ public interface DbHelper {
     Observable<List<TimeTable>> getTimeTables(Station station);
 
     Observable<List<TransferMap>> getTransferMaps(Station station);
+
 }

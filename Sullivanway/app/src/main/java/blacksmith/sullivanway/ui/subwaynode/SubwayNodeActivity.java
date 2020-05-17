@@ -1,5 +1,6 @@
-package blacksmith.sullivanway.ui.stationdetail;
+package blacksmith.sullivanway.ui.subwaynode;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,23 +15,24 @@ import javax.inject.Inject;
 import blacksmith.sullivanway.BR;
 import blacksmith.sullivanway.R;
 import blacksmith.sullivanway.ViewModelProviderFactory;
-import blacksmith.sullivanway.databinding.ActivityStationDetailBinding;
+import blacksmith.sullivanway.data.entity.db.SubwayNode;
+import blacksmith.sullivanway.databinding.ActivitySubwayNodeBinding;
 import blacksmith.sullivanway.ui.base.BaseActivity;
+import blacksmith.sullivanway.ui.subwaynode.stationdetail.StationDetailFragment;
 import blacksmith.sullivanway.utils.ScreenUtils;
 
-public class StationDetailActivity extends BaseActivity<ActivityStationDetailBinding, StationDetailViewModel>
-        implements StationDetailNavigator
+public class SubwayNodeActivity extends BaseActivity<ActivitySubwayNodeBinding, SubwayNodeViewModel>
+        implements SubwayNodeNavigator
 {
-
     @Inject
     ViewModelProviderFactory factory;
 
-    private StationDetailViewModel mStationDetailViewModel;
+    private SubwayNodeViewModel mSubwayNodeViewModel;
 
-    private ActivityStationDetailBinding mActivityStationDetailBinding;
+    private ActivitySubwayNodeBinding mActivityStationNodeBinding;
 
     public static Intent newIntent(Context context) {
-        return new Intent(context, StationDetailActivity.class);
+        return new Intent(context, SubwayNodeActivity.class);
     }
 
     @Override
@@ -40,23 +42,33 @@ public class StationDetailActivity extends BaseActivity<ActivityStationDetailBin
 
     @Override
     public int getLayoutId() {
-        return R.layout.activity_station_detail;
+        return R.layout.activity_subway_node;
     }
 
     @Override
-    public StationDetailViewModel getViewModel() {
-        if (mStationDetailViewModel == null)
-            mStationDetailViewModel = new ViewModelProvider(this, factory).get(StationDetailViewModel.class);
-        return mStationDetailViewModel;
+    public SubwayNodeViewModel getViewModel() {
+        if (mSubwayNodeViewModel == null)
+            mSubwayNodeViewModel = new ViewModelProvider(this, factory).get(SubwayNodeViewModel.class);
+        return mSubwayNodeViewModel;
+    }
+
+    @Override
+    public void swipeLeft() {
+
+    }
+
+    @Override
+    public void swipeRight() {
+
+    }
+
+    @Override
+    public void goBack() {
     }
 
     @Override
     public void handleError(Throwable throwable) {
         // handle error
-    }
-
-    @Override
-    public void goBack() {
     }
 
     @Override
@@ -87,9 +99,27 @@ public class StationDetailActivity extends BaseActivity<ActivityStationDetailBin
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mActivityStationDetailBinding = getViewDataBinding();
-        mStationDetailViewModel.setNavigator(this);
-        setup();
+        mActivityStationNodeBinding = getViewDataBinding();
+        mSubwayNodeViewModel.setNavigator(this);
+
+        Intent intent = getIntent();
+        long subwayNodeId = intent.getLongExtra("subwayNodeId", -1L);
+        if (subwayNodeId != -1L) {
+            SubwayNode subwayNode = new SubwayNode();
+            {
+                subwayNode.id = subwayNodeId;
+            }
+            mSubwayNodeViewModel.loadStations(subwayNode);
+
+            setup();
+        } else {
+            // TODO Alert No SubwayNode Selected!
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+            alertDialogBuilder.setTitle("알림")
+                    .setMessage("선택된 역을 찾을 수 없습니다.")
+                    .create();
+            alertDialogBuilder.show();
+        }
     }
 
     private void setup() {
@@ -113,8 +143,11 @@ public class StationDetailActivity extends BaseActivity<ActivityStationDetailBin
     }
 
     private void subscribeToLiveData() {
-        mStationDetailViewModel.getStationData().observe(this, stationDataList ->
-                mStationDetailViewModel.setStationDataList(stationDataList));
+        mSubwayNodeViewModel.getSubwayNodeData().observe(this, subwayNode ->
+                mSubwayNodeViewModel.setSubwayNode(subwayNode));
+
+        mSubwayNodeViewModel.getStationVoListData().observe(this, stationVos ->
+                mSubwayNodeViewModel.setStationVoList(stationVos));
     }
 
 }
