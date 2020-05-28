@@ -3,9 +3,9 @@ package blacksmith.sullivanwayserver.repo;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-import blacksmith.sullivanwayserver.model.Transfer;
+import blacksmith.sullivanwayserver.model.TimeTable;
 
 @Repository
-public interface TransferRepo extends CrudRepository<Transfer, Long> {
+public interface TimeTableRepo extends CrudRepository<TimeTable, Long> {
 
 }

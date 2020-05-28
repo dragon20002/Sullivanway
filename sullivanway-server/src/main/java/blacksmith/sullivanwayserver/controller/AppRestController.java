@@ -10,17 +10,23 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import blacksmith.sullivanwayserver.model.Congestion;
-import blacksmith.sullivanwayserver.model.Downline;
 import blacksmith.sullivanwayserver.model.Elevator;
+import blacksmith.sullivanwayserver.model.SearchHistory;
 import blacksmith.sullivanwayserver.model.Station;
-import blacksmith.sullivanwayserver.model.Transfer;
-import blacksmith.sullivanwayserver.model.Transfermap;
+import blacksmith.sullivanwayserver.model.StationDetail;
+import blacksmith.sullivanwayserver.model.SubwayLine;
+import blacksmith.sullivanwayserver.model.SubwayNode;
+import blacksmith.sullivanwayserver.model.TimeTable;
+import blacksmith.sullivanwayserver.model.TransferMap;
 import blacksmith.sullivanwayserver.service.CongestionService;
-import blacksmith.sullivanwayserver.service.DownlineService;
 import blacksmith.sullivanwayserver.service.ElevatorService;
+import blacksmith.sullivanwayserver.service.SearchHistoryService;
+import blacksmith.sullivanwayserver.service.StationDetailService;
 import blacksmith.sullivanwayserver.service.StationService;
-import blacksmith.sullivanwayserver.service.TransferService;
-import blacksmith.sullivanwayserver.service.TransfermapService;
+import blacksmith.sullivanwayserver.service.SubwayLineService;
+import blacksmith.sullivanwayserver.service.SubwayNodeService;
+import blacksmith.sullivanwayserver.service.TimeTableService;
+import blacksmith.sullivanwayserver.service.TransferMapService;
 
 @RestController
 @RequestMapping("/api/subway")
@@ -28,44 +34,74 @@ public class AppRestController {
 
 	@Autowired
 	private CongestionService congestionService;
-	@Autowired
-	private DownlineService downlineService;
+
 	@Autowired
 	private ElevatorService elevatorService;
+
+	@Autowired
+	private SearchHistoryService searchHistoryService;
+
 	@Autowired
 	private StationService stationService;
+
 	@Autowired
-	private TransferService transferService;
+	private StationDetailService stationDetailService;
+
 	@Autowired
-	private TransfermapService transfermapService;
-	
+	private SubwayLineService subwayLineService;
+
+	@Autowired
+	private SubwayNodeService subwayNodeService;
+
+	@Autowired
+	private TimeTableService timeTableService;
+
+	@Autowired
+	private TransferMapService transferMapService;
+
 	@GetMapping(value = "/congestions")
-	public ResponseEntity<List<Congestion>> getCongestions() {
-		return new ResponseEntity<>(congestionService.getAll(), HttpStatus.OK);
+	public ResponseEntity<List<Congestion>> getCongestion() {
+	    return new ResponseEntity<>(congestionService.getAll(), HttpStatus.OK);
 	}
-	
-	@GetMapping(value = "/downlines")
-	public ResponseEntity<List<Downline>> getDownlines() {
-		return new ResponseEntity<>(downlineService.getAll(), HttpStatus.OK);
-	}
-	
+
 	@GetMapping(value = "/elevators")
-	public ResponseEntity<List<Elevator>> getElevators() {
-		return new ResponseEntity<>(elevatorService.getAll(), HttpStatus.OK);
+	public ResponseEntity<List<Elevator>> getElevator() {
+	    return new ResponseEntity<>(elevatorService.getAll(), HttpStatus.OK);
 	}
-	
+
+	@GetMapping(value = "/searchhistorys")
+	public ResponseEntity<List<SearchHistory>> getSearchHistory() {
+	    return new ResponseEntity<>(searchHistoryService.getAll(), HttpStatus.OK);
+	}
+
 	@GetMapping(value = "/stations")
-	public ResponseEntity<List<Station>> getStations() {
-		return new ResponseEntity<>(stationService.getAll(), HttpStatus.OK);
+	public ResponseEntity<List<Station>> getStation() {
+	    return new ResponseEntity<>(stationService.getAll(), HttpStatus.OK);
 	}
-	
-	@GetMapping(value = "/transfers")
-	public ResponseEntity<List<Transfer>> getTransfers() {
-		return new ResponseEntity<>(transferService.getAll(), HttpStatus.OK);
+
+	@GetMapping(value = "/stationdetails")
+	public ResponseEntity<List<StationDetail>> getStationDetail() {
+	    return new ResponseEntity<>(stationDetailService.getAll(), HttpStatus.OK);
 	}
-	
+
+	@GetMapping(value = "/subwaylines")
+	public ResponseEntity<List<SubwayLine>> getSubwayLine() {
+	    return new ResponseEntity<>(subwayLineService.getAll(), HttpStatus.OK);
+	}
+
+	@GetMapping(value = "/subwaynodes")
+	public ResponseEntity<List<SubwayNode>> getSubwayNode() {
+	    return new ResponseEntity<>(subwayNodeService.getAll(), HttpStatus.OK);
+	}
+
+	@GetMapping(value = "/timetables")
+	public ResponseEntity<List<TimeTable>> getTimeTable() {
+	    return new ResponseEntity<>(timeTableService.getAll(), HttpStatus.OK);
+	}
+
 	@GetMapping(value = "/transfermaps")
-	public ResponseEntity<List<Transfermap>> getTransfermaps() {
-		return new ResponseEntity<>(transfermapService.getAll(), HttpStatus.OK);
+	public ResponseEntity<List<TransferMap>> getTransferMap() {
+	    return new ResponseEntity<>(transferMapService.getAll(), HttpStatus.OK);
 	}
+
 }

@@ -3,9 +3,9 @@ package blacksmith.sullivanwayserver.repo;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-import blacksmith.sullivanwayserver.model.TransferMap;
+import blacksmith.sullivanwayserver.model.SubwayLine;
 
 @Repository
-public interface TransferMapRepo extends CrudRepository<TransferMap, Long> {
+public interface SubwayLineRepo extends CrudRepository<SubwayLine, Long> {
 
 }

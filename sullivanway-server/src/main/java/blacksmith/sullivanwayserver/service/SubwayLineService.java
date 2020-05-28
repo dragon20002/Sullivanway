@@ -4,17 +4,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
 
-import blacksmith.sullivanwayserver.model.TransferMap;
-import blacksmith.sullivanwayserver.repo.TransferMapRepo;
+import blacksmith.sullivanwayserver.model.SubwayLine;
+import blacksmith.sullivanwayserver.repo.SubwayLineRepo;
 
 @Service
-public class TransferMapService extends BaseService<TransferMap> {
+public class SubwayLineService extends BaseService<SubwayLine> {
 
 	@Autowired
-	TransferMapRepo repo;
+	SubwayLineRepo repo;
 	
 	@Override
-	public CrudRepository<TransferMap, Long> getRepo() {
+	public CrudRepository<SubwayLine, Long> getRepo() {
 		return repo;
 	}
+	
 }

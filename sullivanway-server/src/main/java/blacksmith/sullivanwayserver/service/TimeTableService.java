@@ -4,17 +4,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
 
-import blacksmith.sullivanwayserver.model.TransferMap;
-import blacksmith.sullivanwayserver.repo.TransferMapRepo;
+import blacksmith.sullivanwayserver.model.TimeTable;
+import blacksmith.sullivanwayserver.repo.TimeTableRepo;
 
 @Service
-public class TransferMapService extends BaseService<TransferMap> {
+public class TimeTableService extends BaseService<TimeTable> {
 
 	@Autowired
-	TransferMapRepo repo;
-	
+	TimeTableRepo repo;
+
 	@Override
-	public CrudRepository<TransferMap, Long> getRepo() {
+	public CrudRepository<TimeTable, Long> getRepo() {
 		return repo;
 	}
 }
