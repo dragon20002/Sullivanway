@@ -8,7 +8,13 @@ import javax.persistence.Id;
 import javax.persistence.IdClass;
 
 import blacksmith.sullivanwayserver.model.Congestion.PK;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@NoArgsConstructor
+@Getter
+@Setter
 @Entity(name = "congestion")
 @IdClass(PK.class)
 public class Congestion implements Serializable {

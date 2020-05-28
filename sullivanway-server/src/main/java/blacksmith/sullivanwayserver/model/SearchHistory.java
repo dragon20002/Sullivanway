@@ -8,7 +8,13 @@ import javax.persistence.Id;
 import javax.persistence.IdClass;
 
 import blacksmith.sullivanwayserver.model.SearchHistory.PK;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@NoArgsConstructor
+@Getter
+@Setter
 @Entity(name = "search_history")
 @IdClass(PK.class)
 public class SearchHistory implements Serializable {

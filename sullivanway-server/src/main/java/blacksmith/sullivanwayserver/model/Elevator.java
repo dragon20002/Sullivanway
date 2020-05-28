@@ -8,7 +8,13 @@ import javax.persistence.Id;
 import javax.persistence.IdClass;
 
 import blacksmith.sullivanwayserver.model.Elevator.PK;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@NoArgsConstructor
+@Getter
+@Setter
 @Entity(name = "elevator")
 @IdClass(PK.class)
 public class Elevator implements Serializable {
